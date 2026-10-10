@@ -1,0 +1,28 @@
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# Java
+**/target/
+*.log
+
+# Node
+**/node_modules/
+**/dist/
+**/.vite/
+
+# Environment and runtime data
+.env
+.env.*
+!.env.example
+data/
+
+# Blockchain build output
+contracts/artifacts/
+contracts/cache/
+
+# OS
+.DS_Store
+Thumbs.db
+

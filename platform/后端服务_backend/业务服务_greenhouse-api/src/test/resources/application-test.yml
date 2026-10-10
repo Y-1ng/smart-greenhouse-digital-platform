@@ -1,0 +1,55 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:smart_greenhouse;MODE=MySQL;DATABASE_TO_LOWER=TRUE;DB_CLOSE_DELAY=-1
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  sql:
+    init:
+      mode: always
+      encoding: UTF-8
+      schema-locations: classpath:schema-test.sql
+      data-locations: classpath:data-test.sql
+  data:
+    redis:
+      repositories:
+        enabled: false
+  flyway:
+    enabled: false
+
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+  global-config:
+    banner: false
+
+app:
+  security:
+    jwt-secret: test-jwt-secret-for-smart-greenhouse-api-2026
+    jwt-expires-minutes: 120
+  iot:
+    service-username: iot-service
+    service-password: "123"
+  control:
+    timeout-scan:
+      # 测试中关闭定时超时扫描，避免后台任务改动测试数据
+      enabled: false
+  external:
+    weather:
+      # 测试中关闭气象定时同步，避免后台任务改动测试数据
+      sync-enabled: false
+  storage:
+    provider: local
+    local-root: ${java.io.tmpdir}/smart-greenhouse-test-files
+    minio-endpoint: http://localhost:9000
+    minio-access-key: minioadmin
+    minio-secret-key: minioadmin
+    minio-bucket: smart-greenhouse-test
+  chain:
+    mode: simulated
+    block-base: 1284600
+    endpoint: http://localhost:20200
+    group-id: group0
+    compensation:
+      # 测试中关闭定时补偿，避免后台任务改动测试数据
+      enabled: false

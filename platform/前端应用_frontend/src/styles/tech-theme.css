@@ -1,0 +1,534 @@
+:root {
+  color-scheme: dark;
+  color: #e8fff5;
+  background: #110f0f;
+  --tech-bg: #110f0f;
+  --tech-panel: #161618;
+  --tech-panel-strong: #1c1c1f;
+  --tech-panel-soft: #22252a;
+  --tech-line: rgb(255 255 255 / 8%);
+  --tech-line-strong: rgb(93 135 255 / 36%);
+  --tech-text: #e3e3e8;
+  --tech-muted: #8f8fa3;
+  --tech-green: #5d87ff;
+  --tech-green-strong: #4b75ec;
+  --tech-success: #13deb9;
+  --tech-amber: #ffae1f;
+  --tech-blue: #38c0fc;
+  --tech-red: #ff4d4f;
+  --custom-radius: 12px;
+}
+
+body {
+  background: var(--tech-bg);
+}
+
+.shell-content {
+  color: var(--tech-text);
+  background: transparent;
+}
+
+.shell-content .page-heading {
+  min-height: 58px;
+  margin-bottom: 14px;
+  padding: 10px 13px;
+  background: rgb(10 28 21 / 72%);
+  border: 1px solid var(--tech-line);
+  border-radius: 8px;
+  box-shadow: inset 0 1px rgb(255 255 255 / 2%);
+}
+
+.shell-content .production-command-head,
+.shell-content .quality-page > .page-heading,
+.shell-content .cooperation-page > .page-heading,
+.shell-content .governance-page > .page-heading {
+  margin-bottom: 0;
+}
+
+.shell-content .page-heading h2,
+.shell-content .topbar h1,
+.shell-content h1,
+.shell-content h2,
+.shell-content h3,
+.shell-content h4,
+.shell-content strong,
+.shell-content dd {
+  color: var(--tech-text) !important;
+}
+
+.shell-content .page-heading p,
+.shell-content p,
+.shell-content small,
+.shell-content dt,
+.shell-content .eyebrow {
+  color: var(--tech-muted);
+}
+
+.shell-content .eyebrow {
+  color: var(--tech-green) !important;
+}
+
+.shell-content .panel,
+.shell-content .production-panel,
+.shell-content .production-summary,
+.shell-content .production-scene-panel,
+.shell-content .production-hotspot-card,
+.shell-content .production-device-card,
+.shell-content .production-chain-band,
+.shell-content .metric,
+.shell-content .production-metric-card,
+.shell-content .production-trend-card,
+.shell-content .trace-query-panel,
+.shell-content .report-panel,
+.shell-content .trace-ledger-panel,
+.shell-content .quality-management-panel,
+.shell-content .cooperation-chart-panel,
+.shell-content .governance-chain-panel,
+.shell-content .governance-external-panel,
+.shell-content .governance-alert-panel {
+  color: var(--tech-text) !important;
+  background: rgb(10 29 22 / 91%) !important;
+  border-color: var(--tech-line) !important;
+  box-shadow:
+    inset 0 1px rgb(255 255 255 / 2.5%),
+    0 14px 40px rgb(0 0 0 / 12%);
+}
+
+.shell-content .panel__header,
+.shell-content .production-panel-heading,
+.shell-content .production-command-bar,
+.shell-content .production-scene-heading,
+.shell-content .production-chain-head,
+.shell-content .production-chain-foot {
+  background: rgb(12 35 26 / 86%) !important;
+  border-color: var(--tech-line) !important;
+}
+
+.shell-content .production-command-bar {
+  position: sticky;
+  top: 70px;
+  z-index: 26;
+  color: var(--tech-text);
+  border: 1px solid var(--tech-line) !important;
+  box-shadow: 0 12px 34px rgb(0 0 0 / 16%);
+  backdrop-filter: blur(16px);
+}
+
+.shell-content .panel__body,
+.shell-content .production-bottom-grid,
+.shell-content .production-workspace,
+.shell-content .quality-workspace {
+  background: transparent;
+}
+
+.shell-content .metric-grid {
+  position: sticky;
+  top: 76px;
+  z-index: 24;
+  padding: 6px;
+  background: rgb(6 17 13 / 76%);
+  border: 1px solid rgb(100 225 166 / 9%);
+  border-radius: 8px;
+  backdrop-filter: blur(14px);
+}
+
+.shell-content .metric {
+  position: relative;
+  overflow: hidden;
+  background:
+    linear-gradient(135deg, rgb(72 215 145 / 6%), transparent 48%),
+    rgb(10 29 22 / 94%) !important;
+}
+
+.shell-content .metric::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 38px;
+  height: 2px;
+  background: var(--tech-green);
+  box-shadow: 0 0 14px rgb(79 224 160 / 42%);
+}
+
+.shell-content .metric__label,
+.shell-content .metric__unit {
+  color: #8aa799 !important;
+}
+
+.shell-content .metric__value {
+  color: #ecfff6 !important;
+}
+
+.shell-content .table-wrap {
+  background: transparent;
+}
+
+.shell-content .data-table th,
+.shell-content .data-table td {
+  border-color: rgb(102 222 166 / 11%);
+}
+
+.shell-content .data-table th {
+  color: #9cb9aa !important;
+  background: rgb(12 35 26 / 88%) !important;
+}
+
+.shell-content .data-table td {
+  color: #d7eee2;
+}
+
+.shell-content .data-table tbody tr:hover {
+  background: rgb(75 212 145 / 6%);
+}
+
+.shell-content input,
+.shell-content select,
+.shell-content textarea,
+.shell-content .text-input {
+  color: #e4fff2 !important;
+  background: rgb(3 14 9 / 74%) !important;
+  border-color: rgb(102 224 166 / 18%) !important;
+}
+
+.shell-content input::placeholder,
+.shell-content textarea::placeholder {
+  color: #5d776b;
+}
+
+.shell-content .primary-button {
+  color: #062116 !important;
+  background: linear-gradient(135deg, #74eeb5, #38ca8c) !important;
+  border-color: transparent !important;
+  box-shadow: 0 0 22px rgb(67 217 149 / 13%);
+}
+
+.shell-content .secondary-button,
+.shell-content .text-button,
+.shell-content .icon-button,
+.shell-content .production-icon-button,
+.shell-content .production-site-button {
+  color: #a7c9b8 !important;
+  background: rgb(255 255 255 / 3%) !important;
+  border-color: rgb(99 225 165 / 17%) !important;
+}
+
+.shell-content .secondary-button:hover,
+.shell-content .text-button:hover,
+.shell-content .icon-button:hover,
+.shell-content .production-icon-button:hover,
+.shell-content .production-site-button:hover {
+  color: #e8fff5 !important;
+  background: rgb(73 213 145 / 9%) !important;
+  border-color: var(--tech-line-strong) !important;
+}
+
+.shell-content .production-scene-panel {
+  background:
+    linear-gradient(180deg, rgb(18 49 37 / 95%), rgb(5 18 12 / 97%)) !important;
+}
+
+.shell-content .production-scene-heading h3,
+.shell-content .production-scene-heading p {
+  color: var(--tech-text) !important;
+}
+
+.shell-content .production-scene-heading p {
+  color: #88a596 !important;
+}
+
+.shell-content .production-scene-site {
+  color: #dff8ec !important;
+  background: rgb(4 17 11 / 82%) !important;
+  border-color: var(--tech-line) !important;
+  backdrop-filter: blur(12px);
+}
+
+.shell-content .production-scene-site span,
+.shell-content .production-scene-site small {
+  color: #789487 !important;
+}
+
+.shell-content .production-layer-tabs {
+  background: rgb(0 0 0 / 18%) !important;
+  border-color: var(--tech-line) !important;
+}
+
+.shell-content .production-layer-tabs button {
+  color: #789487 !important;
+}
+
+.shell-content .production-layer-tabs button.is-active {
+  color: #072116 !important;
+  background: #55dfa0 !important;
+}
+
+.shell-content .production-summary .production-panel-heading,
+.shell-content .production-inspector .production-panel-heading {
+  background: transparent !important;
+}
+
+.shell-content .production-metric-card {
+  color: #dff8ec !important;
+  background: transparent !important;
+  border-color: rgb(96 220 163 / 10%) !important;
+}
+
+.shell-content .production-metric-card:hover,
+.shell-content .production-metric-card:focus-visible {
+  background: rgb(69 211 143 / 7%) !important;
+}
+
+.shell-content .production-trend-card {
+  background:
+    linear-gradient(145deg, rgb(255 255 255 / 2.5%), transparent 55%),
+    rgb(10 29 22 / 96%) !important;
+}
+
+.shell-content .production-trend-card.is-temperature {
+  border-color: rgb(255 129 117 / 29%) !important;
+}
+
+.shell-content .production-trend-card.is-water {
+  border-color: rgb(86 170 255 / 27%) !important;
+}
+
+.shell-content .production-trend-card.is-light {
+  border-color: rgb(241 182 80 / 29%) !important;
+}
+
+.shell-content .production-trend-card.is-soil {
+  border-color: rgb(79 224 160 / 27%) !important;
+}
+
+.shell-content .production-trend-card small,
+.shell-content .production-trend-card footer {
+  color: #779487 !important;
+}
+
+.shell-content .production-trend-card strong {
+  color: #ecfff6 !important;
+}
+
+.shell-content .production-trend-card__icon {
+  background: rgb(0 0 0 / 19%) !important;
+}
+
+.shell-content .trend-grid {
+  stroke: rgb(129 182 156 / 20%) !important;
+}
+
+.shell-content .production-trend-grid:has(.production-trend-card:hover)
+  .production-trend-card:not(:hover) {
+  opacity: 0.5;
+}
+
+.shell-content .production-trend-card {
+  transition:
+    opacity 180ms ease,
+    border-color 180ms ease,
+    transform 180ms ease;
+}
+
+.shell-content .production-trend-card:hover {
+  transform: translateY(-1px);
+}
+
+.shell-content .production-water-list article {
+  border-color: rgb(102 222 166 / 10%) !important;
+}
+
+.shell-content .production-water-list article:hover,
+.shell-content .production-water-list article.is-selected {
+  background: rgb(67 211 142 / 7%) !important;
+}
+
+.shell-content .production-device-list article {
+  cursor: pointer;
+  transition:
+    background-color 150ms ease,
+    box-shadow 150ms ease;
+}
+
+.shell-content .production-device-list article:hover,
+.shell-content .production-device-list article:focus-visible {
+  background: rgb(67 211 142 / 7%) !important;
+  box-shadow: inset 2px 0 #4fe0a0;
+  outline: none;
+}
+
+.shell-content .production-water-list span,
+.shell-content .production-device-list small,
+.shell-content .production-device-empty {
+  color: #789487 !important;
+}
+
+.shell-content .production-chain-chart,
+.shell-content .production-chain-hash {
+  background: transparent !important;
+}
+
+.shell-content .production-chain-hash__list li::before {
+  background: rgb(96 224 164 / 18%) !important;
+}
+
+.shell-content .production-chain-hash__list code,
+.shell-content .production-chain-foot__root code {
+  color: #72efb5 !important;
+}
+
+.shell-content .cooperation-chart-layout,
+.shell-content .cooperation-donut-panel,
+.shell-content .cooperation-bars-panel,
+.shell-content .cooperation-dividend-columns,
+.shell-content .cooperation-donut-legend button,
+.shell-content .cooperation-dividend-columns__focus,
+.shell-content .cooperation-bars li {
+  color: #dff8ec !important;
+  background: rgb(7 23 16 / 86%) !important;
+  border-color: var(--tech-line) !important;
+}
+
+.shell-content .cooperation-donut-block__head strong,
+.shell-content .cooperation-bars-panel__head strong,
+.shell-content .cooperation-dividend-columns__focus strong,
+.shell-content .cooperation-bars__head strong {
+  color: #eafff3 !important;
+}
+
+.shell-content .cooperation-donut-block__head span,
+.shell-content .cooperation-donut-legend small,
+.shell-content .cooperation-dividend-columns__focus span,
+.shell-content .cooperation-bars-panel__head span,
+.shell-content .cooperation-bars__head span {
+  color: #748f82 !important;
+}
+
+.shell-content .cooperation-dividend-columns__plot,
+.shell-content .cooperation-bars {
+  background: rgb(0 0 0 / 12%) !important;
+}
+
+.shell-content .cooperation-dividend-columns {
+  background: rgb(4 17 11 / 84%) !important;
+}
+
+.shell-content .cooperation-dividend-columns__grid {
+  background:
+    repeating-linear-gradient(
+      to bottom,
+      transparent 0,
+      transparent calc(25% - 1px),
+      rgb(92 209 153 / 12%) calc(25% - 1px),
+      rgb(92 209 153 / 12%) 25%
+    ) !important;
+}
+
+.shell-content .cooperation-donut__track {
+  stroke: rgb(92 209 153 / 11%) !important;
+}
+
+.shell-content .cooperation-dividend-column em,
+.shell-content .cooperation-dividend-column small {
+  color: #748f82 !important;
+}
+
+.shell-content .governance-chain-address,
+.shell-content .governance-chain-overview,
+.shell-content .governance-chain-overview__item,
+.shell-content .governance-external-list li,
+.shell-content .governance-external-logs,
+.shell-content .governance-alert-list li,
+.shell-content .governance-alert-empty {
+  color: #dff8ec !important;
+  background: rgb(7 23 16 / 88%) !important;
+  border-color: var(--tech-line) !important;
+}
+
+.shell-content .governance-chain-address.is-missing {
+  color: #f3c36a !important;
+  background: rgb(241 182 80 / 7%) !important;
+  border-color: rgb(241 182 80 / 20%) !important;
+}
+
+.shell-content .governance-external-body strong,
+.shell-content .governance-alert-body strong {
+  color: #eafff3 !important;
+}
+
+.shell-content .governance-external-body small,
+.shell-content .governance-alert-body small,
+.shell-content .governance-source {
+  color: #748f82 !important;
+}
+
+.shell-content .trace-chain-strip {
+  background: rgb(10 29 22 / 90%) !important;
+  border-color: var(--tech-line) !important;
+}
+
+.shell-content .trace-proof-grid > *,
+.shell-content .trace-proof-card,
+.shell-content .trace-ledger,
+.shell-content .trace-chain-panel,
+.shell-content .trace-block,
+.shell-content .trace-block-list,
+.shell-content .quality-management-grid > *,
+.shell-content .cooperation-donut-block,
+.shell-content .cooperation-action-panel,
+.shell-content .production-recipe-detail,
+.shell-content .production-water-form {
+  background: rgb(8 24 18 / 92%) !important;
+  border-color: var(--tech-line) !important;
+}
+
+.shell-content .trace-block__head span,
+.shell-content .trace-block strong {
+  color: #eafff3 !important;
+}
+
+.shell-content .trace-block code {
+  color: #70eab2 !important;
+}
+
+.shell-content .trace-block small,
+.shell-content .trace-block time {
+  color: #748f82 !important;
+}
+
+.shell-content .management-form__verify,
+.shell-content .report-file-picker,
+.shell-content .report-result {
+  color: #dff8ec !important;
+  background: rgb(5 20 13 / 82%) !important;
+  border-color: var(--tech-line) !important;
+}
+
+.shell-content .management-form__verify small,
+.shell-content .report-file-picker small {
+  color: #748f82 !important;
+}
+
+.shell-content .status-tag {
+  color: #77efb6 !important;
+  background: rgb(55 199 130 / 9%) !important;
+  border-color: rgb(82 225 157 / 22%) !important;
+}
+
+.shell-content .status-tag--warning {
+  color: #f6c66d !important;
+  background: rgb(241 182 80 / 10%) !important;
+  border-color: rgb(241 182 80 / 28%) !important;
+}
+
+.shell-content .status-tag--offline {
+  color: #ff9a8f !important;
+  background: rgb(255 129 117 / 9%) !important;
+  border-color: rgb(255 129 117 / 25%) !important;
+}
+
+@media (max-width: 760px) {
+  .shell-content .metric-grid {
+    top: 68px;
+  }
+}

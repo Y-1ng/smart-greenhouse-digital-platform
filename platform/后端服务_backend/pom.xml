@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.3.5</version>
+        <relativePath/>
+    </parent>
+
+    <groupId>com.smartgreenhouse</groupId>
+    <artifactId>smart-greenhouse-backend</artifactId>
+    <version>0.1.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <name>smart-greenhouse-backend</name>
+    <description>智慧温室大棚数字化管理平台后端</description>
+
+    <modules>
+        <module>公共模块_greenhouse-common</module>
+        <module>业务服务_greenhouse-api</module>
+        <module>物联网服务_greenhouse-iot</module>
+    </modules>
+
+    <properties>
+        <java.version>17</java.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <mybatis-plus.version>3.5.7</mybatis-plus.version>
+        <!-- ZXing：一物一码二维码的 PNG / SVG 生成 -->
+        <zxing.version>3.5.3</zxing.version>
+    </properties>
+</project>

@@ -1,0 +1,7 @@
+flowchart TB
+  A[展示交互层<br/>园区驾驶舱 单棚孪生 水肥面板 溯源中心 政府看板]
+  B[接入服务层<br/>REST API WebSocket MQTT 文件上传 统一认证]
+  C[业务服务层<br/>环境监测 智能调控 水肥一体 质量溯源 合作运营 治理分析]
+  D[数据服务层<br/>MySQL Redis MinIO 时序数据 链上索引]
+  E[基础设施层<br/>物联网终端 FISCO BCOS 京东农场接口 气象服务 短信预警]
+  A --> B --> C --> D --> E

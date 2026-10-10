@@ -1,0 +1,44 @@
+server:
+  port: ${DEMO_API_PORT:8090}
+
+spring:
+  datasource:
+    url: jdbc:h2:mem:smart_greenhouse;MODE=MySQL;DATABASE_TO_LOWER=TRUE;DB_CLOSE_DELAY=-1
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  data:
+    redis:
+      repositories:
+        enabled: false
+
+logging:
+  level:
+    org.flywaydb: INFO
+
+app:
+  ai:
+    # 通过环境变量 DEEPSEEK_API_KEY 提供；不要提交真实密钥。
+    api-key: ${DEEPSEEK_API_KEY:sk-not-configured}
+  trace:
+    qr:
+      # 演示环境：二维码指向 ngrok 账号绑定的固定公网域名，域名不随重启变化，
+      # 只要隧道在线，手机连任何网络都能扫码打开，二维码不用重印。
+      # 演示总控（DemoAllInOneApplication）启动时会探测在线隧道并覆盖本项，
+      # 隧道不在线则退回 http://<当前局域网IP>:5199；也可以用环境变量
+      # TRACE_PUBLIC_BASE_URL 显式指定，任何情况下都以显式配置为准。
+      public-base-url: ${TRACE_PUBLIC_BASE_URL:https://sage-ship-scribing.ngrok-free.dev}
+  chain:
+    namespace-mode: auto
+  demo:
+    water-fertilizer:
+      ensure-interval-ms: 60000
+      ensure-initial-delay-ms: 45000
+    telemetry:
+      enabled: true
+      # 留空表示自动覆盖所有已配置设备的大棚；也可填写逗号分隔的温室编号
+      greenhouse-codes:
+      interval-ms: 15000
+      initial-delay-ms: 6000
+      # 改成 true 后温度会逐步升入告警区间，用于演示阈值告警
+      alert-demo: false

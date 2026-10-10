@@ -1,0 +1,2882 @@
+/* ============================================================================
+   玻璃温室 · 薄荷青绿
+   ---------------------------------------------------------------------------
+   视觉北极星：一张在白天温室前悬浮的玻璃工作台。
+
+   规则（与 DESIGN.md 同步）：
+   1. 绿色是身份与选择：品牌、选中态、成功、一般主按钮。
+   2. 暖橙是执行动作：立即通风 / 执行灌溉 / AI 入口，仅限不可逆或即时下发。
+   3. 玻璃只出现在真有层级的地方：外层窗口、导航、工具条、浮层、场景 HUD。
+      数据卡一律是白色实体面，不做装饰性毛玻璃。
+   4. 一个界面只有一个行动声部：橙色按钮在一屏内最多一个。
+   5. 面板半径 18/20，控件 12/14，胶囊仅用于小控件与状态。
+
+   本文件最后加载，用于替换此前的深色导航 + 赤陶配色。
+   ============================================================================ */
+
+/* ---------------------------------------------------------------------------
+   1. 设计令牌
+   --------------------------------------------------------------------------- */
+
+:root {
+  /* tech-theme.css 之前把整站声明成深色，浅色主题要显式改回来：
+     原生滚动条、日期选择器等表单控件都跟着这个走 */
+  color-scheme: light;
+
+  /* 冷玻璃青底 */
+  --glass-base: #dce9e7;
+  --glass-base-soft: #e9f2f0;
+
+  /* 霜绿：身份与选择 */
+  --mint-50: #f1f8f6;
+  --mint-100: #e2f0ec;
+  --mint-200: #c6e2da;
+  --mint-300: #9acbbe;
+  --mint-400: #4fae99;
+  --mint-500: #1e957d;
+  --mint-600: #0e7c6b;
+  --mint-700: #0a6558;
+  --mint-800: #084f45;
+
+  /* 暖橙：只给执行动作 */
+  --action-orange: #c25a2b;
+  --action-orange-strong: #a94a20;
+  --action-orange-soft: #f8eae2;
+
+  /* 墨色文本 */
+  --ink-900: #12241e;
+  --ink-700: #3d544b;
+  --ink-500: #6b837a;
+  --ink-300: #9bafa7;
+  --ink-100: #d7e5de;
+
+  /* 玻璃与画布 */
+  --glass-window: rgb(255 255 255 / 62%);
+  --glass-panel: rgb(255 255 255 / 72%);
+  --glass-rail: rgb(255 255 255 / 56%);
+  --glass-edge: rgb(255 255 255 / 72%);
+  --glass-hairline: rgb(18 36 30 / 7%);
+  --canvas-top: #f7fbfa;
+  --canvas-bottom: #e9f2f0;
+
+  --color-strong: var(--ink-900);
+  --color-body: var(--ink-700);
+  --color-muted: var(--ink-500);
+  --color-faint: var(--ink-300);
+  --color-line: #e2efe9;
+  --color-line-soft: #eff6f2;
+
+  --color-primary: var(--mint-600);
+  --color-primary-strong: var(--mint-700);
+  --color-primary-ink: var(--mint-800);
+  --color-primary-soft: var(--mint-100);
+
+  --color-success: #14876b;
+  --color-success-strong: #0a6558;
+  --color-success-soft: #e2f0ec;
+  --color-warning: #c98a16;
+  --color-warning-strong: #9a6a0d;
+  --color-warning-soft: #fdf3e2;
+  --color-danger: #d9534f;
+  --color-danger-strong: #b23b37;
+  --color-danger-soft: #fdecea;
+  --color-info: #4e93d6;
+  --color-info-strong: #2b6fb0;
+  --color-info-soft: #e9f2fb;
+
+  --soft-bg: #eaf3f1;
+  --soft-panel: #ffffff;
+  --soft-panel-translucent: rgb(255 255 255 / 72%);
+  --soft-panel-soft: #f4f9f8;
+  --soft-border: var(--glass-hairline);
+  --soft-text: var(--ink-900);
+  --soft-text-secondary: var(--ink-500);
+  --soft-muted: var(--ink-300);
+  --soft-accent: var(--mint-600);
+  --soft-accent-soft: rgb(14 124 107 / 10%);
+  --soft-shadow:
+    0 1px 2px rgb(13 79 58 / 4%),
+    0 10px 28px rgb(13 79 58 / 7%);
+
+  --glass-shadow:
+    0 26px 70px rgb(9 62 54 / 16%),
+    inset 0 1px rgb(255 255 255 / 88%);
+
+  --font-dashboard: "Noto Sans SC", "Microsoft YaHei UI", "Microsoft YaHei", sans-serif;
+  --font-dashboard-number: "DIN Next LT Pro", Bahnschrift, "Segoe UI", sans-serif;
+  --font-dashboard-code: Consolas, "Courier New", monospace;
+}
+
+/* ---------------------------------------------------------------------------
+   2. 环境背景：柔和薄荷光场
+   参考图里窗口外是日光穿过玻璃的浅绿雾面，不是纯色。
+   --------------------------------------------------------------------------- */
+
+body {
+  background:
+    radial-gradient(1180px 640px at 8% -8%, #eef6f4 0%, rgb(238 246 244 / 0%) 62%),
+    radial-gradient(900px 560px at 98% 4%, #e2f0f1 0%, rgb(226 240 241 / 0%) 58%),
+    radial-gradient(760px 620px at 72% 108%, #dfeeea 0%, rgb(223 238 234 / 0%) 62%),
+    linear-gradient(158deg, #e7f1ef 0%, var(--glass-base) 52%, #d5e6e2 100%) !important;
+  background-attachment: fixed !important;
+}
+
+::selection {
+  color: var(--ink-900);
+  background: var(--mint-200);
+}
+
+/* ---------------------------------------------------------------------------
+   3. 悬浮玻璃窗口
+   --------------------------------------------------------------------------- */
+
+.tech-app-shell {
+  grid-template-columns: 72px 300px minmax(0, 1fr) !important;
+  color: var(--ink-900) !important;
+  background: var(--glass-window) !important;
+  border: 1px solid var(--glass-edge) !important;
+  border-radius: 28px !important;
+  box-shadow: var(--glass-shadow) !important;
+  backdrop-filter: blur(26px) saturate(1.22) !important;
+}
+
+/* 一级导航：只有图标的蓝灰玻璃胶囊列（参考图：无文字、无品牌块、圆角更大） */
+.icon-rail {
+  --nav-icon: #7b93a6;
+  --nav-icon-strong: #46637a;
+  height: calc(100vh - 44px) !important;
+  margin: 10px 6px 10px 12px !important;
+  padding: 16px 6px !important;
+  background: var(--glass-rail) !important;
+  border: 1px solid rgb(255 255 255 / 62%) !important;
+  border-radius: 34px !important;
+  box-shadow:
+    0 14px 34px rgb(9 62 54 / 9%),
+    inset 0 1px 0 rgb(255 255 255 / 86%) !important;
+  backdrop-filter: blur(22px) saturate(1.1) !important;
+}
+
+.icon-rail__brand {
+  display: none !important;
+}
+
+.icon-rail__nav {
+  gap: 4px !important;
+  margin-top: 0 !important;
+}
+
+.icon-rail__item {
+  width: 48px !important;
+  min-height: 54px !important;
+  margin: 0 auto !important;
+  color: var(--nav-icon) !important;
+  border: 1px solid transparent !important;
+  border-radius: 18px !important;
+  transition:
+    color 180ms cubic-bezier(0.22, 1, 0.36, 1),
+    background-color 180ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 180ms cubic-bezier(0.22, 1, 0.36, 1) !important;
+}
+
+.icon-rail__item svg {
+  width: 24px;
+  height: 24px;
+}
+
+/* 参考图的一级导航没有文字，模块名交给 title / aria-label 承担 */
+.icon-rail__item small {
+  display: none !important;
+}
+
+.icon-rail__item:hover {
+  color: var(--nav-icon-strong) !important;
+  background: rgb(255 255 255 / 62%) !important;
+}
+
+.icon-rail__item.router-link-exact-active {
+  color: var(--nav-icon-strong) !important;
+  background: rgb(255 255 255 / 84%) !important;
+  box-shadow:
+    0 8px 18px rgb(9 62 54 / 10%),
+    inset 0 1px 0 rgb(255 255 255 / 92%) !important;
+}
+
+.icon-rail__item.router-link-exact-active::before {
+  display: none !important;
+}
+
+.icon-rail__foot {
+  border-top: 1px solid var(--glass-hairline) !important;
+}
+
+.icon-rail__foot button {
+  color: var(--ink-500) !important;
+  border-radius: 14px !important;
+}
+
+.icon-rail__foot button:hover {
+  color: var(--color-danger) !important;
+  background: var(--color-danger-soft) !important;
+}
+
+.rail-online {
+  background: #4bbf8f !important;
+  box-shadow: 0 0 0 5px rgb(75 191 143 / 14%) !important;
+}
+
+/* 二级导航：独立玻璃卡 */
+.module-panel {
+  top: 10px !important;
+  height: calc(100vh - 44px) !important;
+  margin: 10px 10px 10px 0 !important;
+  color: var(--ink-900) !important;
+  background: var(--glass-panel) !important;
+  border: 1px solid rgb(255 255 255 / 64%) !important;
+  border-radius: 28px !important;
+  box-shadow:
+    0 16px 40px rgb(9 62 54 / 10%),
+    inset 0 1px 0 rgb(255 255 255 / 86%) !important;
+  backdrop-filter: blur(24px) saturate(1.1) !important;
+}
+
+/* 参考图的二级面板没有标题块，模块名由一级导航的选中项承担 */
+.module-panel__header {
+  padding: 12px 16px 4px !important;
+}
+
+.module-panel__header > div {
+  display: none !important;
+}
+
+.module-panel__header > button {
+  color: var(--ink-500) !important;
+  background: rgb(255 255 255 / 70%) !important;
+  border: 1px solid var(--glass-hairline) !important;
+  border-radius: 12px !important;
+}
+
+/* 系统状态收成一条安静的状态行，接住参考图顶部的分隔线 */
+.module-panel__system {
+  margin: 0 0 8px !important;
+  padding: 10px 22px !important;
+  background: transparent !important;
+  border: 0 !important;
+  border-bottom: 1px solid rgb(18 36 30 / 7%) !important;
+  border-radius: 0 !important;
+}
+
+.module-panel__system span {
+  color: var(--ink-500) !important;
+}
+
+.module-panel__system strong {
+  color: var(--mint-700) !important;
+}
+
+/* 行：图标 + 标题 + 右箭头，行高按参考图放大 */
+.module-navigation {
+  gap: 0 !important;
+  padding: 0 !important;
+}
+
+.module-navigation button {
+  grid-template-columns: 26px minmax(0, 1fr) auto !important;
+  gap: 16px !important;
+  min-height: 64px !important;
+  margin: 0 10px !important;
+  padding: 0 14px !important;
+  color: #4a5d68 !important;
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 16px !important;
+  box-shadow: none !important;
+}
+
+.module-navigation__icon {
+  display: grid;
+  place-items: center;
+  color: #7b93a6;
+}
+
+.module-navigation__icon svg {
+  width: 23px;
+  height: 23px;
+}
+
+.module-navigation__text strong {
+  font-size: 16px !important;
+  font-weight: 500 !important;
+  letter-spacing: 0 !important;
+}
+
+.module-navigation__text small {
+  display: none !important;
+}
+
+.module-navigation button > svg {
+  color: #a9bcc7 !important;
+}
+
+.module-navigation button:hover {
+  color: #2f4a5a !important;
+  background: rgb(255 255 255 / 62%) !important;
+}
+
+.module-navigation button:hover .module-navigation__icon {
+  color: #46637a !important;
+}
+
+/* 选中项：内缩的圆角实心绿块 */
+.module-navigation button.is-active {
+  color: #ffffff !important;
+  background: #2f9a72 !important;
+  border: 0 !important;
+  border-radius: 16px !important;
+  box-shadow: 0 10px 22px rgb(47 154 114 / 26%) !important;
+}
+
+.module-navigation button.is-active .module-navigation__icon,
+.module-navigation button.is-active > svg {
+  color: #ffffff !important;
+}
+
+.module-navigation button.is-active .module-navigation__text strong {
+  font-weight: 600 !important;
+}
+
+/* 底部协同指数收成一条扁平页脚，接住参考图下方的分隔线 */
+.module-panel__meter {
+  margin: 8px 22px 16px !important;
+  padding: 14px 0 0 !important;
+  background: transparent !important;
+  border: 0 !important;
+  border-top: 1px solid rgb(18 36 30 / 7%) !important;
+  border-radius: 0 !important;
+}
+
+.module-panel__meter span,
+.module-panel__meter small {
+  color: var(--ink-500) !important;
+}
+
+.module-panel__meter strong {
+  color: var(--ink-900) !important;
+}
+
+.module-panel__meter i {
+  background: linear-gradient(90deg, var(--mint-500), var(--mint-700)) !important;
+  box-shadow: none !important;
+}
+
+.module-panel__backdrop {
+  background: rgb(18 36 30 / 26%) !important;
+  backdrop-filter: blur(4px) !important;
+}
+
+/* ---------------------------------------------------------------------------
+   4. 工作台与顶部工具条
+   --------------------------------------------------------------------------- */
+
+.shell-main {
+  background: linear-gradient(180deg, var(--canvas-top) 0%, var(--canvas-bottom) 100%) !important;
+  border: 1px solid var(--glass-hairline) !important;
+  border-radius: 22px !important;
+  box-shadow:
+    0 16px 40px rgb(9 62 54 / 9%),
+    inset 0 1px 0 rgb(255 255 255 / 78%) !important;
+}
+
+.shell-topbar {
+  min-height: 62px !important;
+  background: rgb(255 255 255 / 78%) !important;
+  border-bottom: 1px solid var(--glass-hairline) !important;
+  backdrop-filter: blur(18px) saturate(1.15) !important;
+}
+
+.shell-topbar__title span {
+  color: var(--mint-700) !important;
+  font-weight: 700 !important;
+}
+
+.shell-topbar__title h1 {
+  color: var(--ink-900) !important;
+  font-weight: 650 !important;
+}
+
+.shell-topbar__title p {
+  color: var(--ink-500) !important;
+}
+
+.shell-topbar__menu {
+  color: var(--ink-700) !important;
+  background: rgb(255 255 255 / 88%) !important;
+  border: 1px solid var(--glass-hairline) !important;
+  border-radius: 14px !important;
+}
+
+.shell-topbar__telemetry span {
+  color: var(--ink-700) !important;
+  background: rgb(255 255 255 / 82%) !important;
+  border: 1px solid var(--glass-hairline) !important;
+  border-radius: 999px !important;
+}
+
+.shell-user {
+  color: var(--ink-700) !important;
+  background: rgb(255 255 255 / 82%) !important;
+  border: 1px solid var(--glass-hairline) !important;
+  border-radius: 999px !important;
+}
+
+.shell-user strong {
+  color: var(--ink-900) !important;
+}
+
+.shell-user small {
+  color: var(--ink-500) !important;
+}
+
+/* AI 入口是执行型动作：保留唯一的暖橙声部 */
+.ai-entry {
+  color: #ffffff !important;
+  background: linear-gradient(140deg, #d4703e, #b24e22) !important;
+  border: 1px solid rgb(194 90 43 / 40%) !important;
+  border-radius: 999px !important;
+  box-shadow: 0 10px 22px rgb(194 90 43 / 24%) !important;
+}
+
+.ai-entry:hover {
+  background: linear-gradient(140deg, #cd6634, #a94a20) !important;
+}
+
+.shell-content {
+  background: transparent !important;
+}
+
+.shell-content::-webkit-scrollbar-thumb {
+  background: rgb(18 36 30 / 14%) !important;
+  border: 2px solid transparent !important;
+  border-radius: 999px !important;
+  background-clip: padding-box !important;
+}
+
+/* ---------------------------------------------------------------------------
+   5. 表面系统：白色数据面
+   ---------------------------------------------------------------------------
+   数据卡不是玻璃。它们是一块实心白面 + 1px 发丝边界 + 上缘内侧高光，
+   靠"边缘的亮"和"扩散的影"做层次，不做 backdrop-filter 装饰性模糊。
+   玻璃只保留在：悬浮窗口、导航、工具条、抽屉、弹窗、三维场景 HUD。
+   --------------------------------------------------------------------------- */
+
+.production-v2 :is(
+  .pv2-statusbar,
+  .pv2-sync-warning,
+  .pv2-metric-ribbon > button,
+  .pv2-crop-card,
+  .pv2-device-rack,
+  .pv2-trend-wall,
+  .pv2-trend-cell,
+  .pv2-water,
+  .pv2-proof,
+  .pv2-hash-stack > div,
+  .pv2-water-list > button,
+  .pv2-water-summary
+),
+.trace-v2 :is(
+  .tv2-node-line,
+  .tv2-console,
+  .tv2-evidence,
+  .tv2-lab,
+  .tv2-chain-body,
+  .tv2-operations > form,
+  .tv2-proof-cards article,
+  .tv2-block-track article,
+  .tv2-uploaded,
+  .tv2-key-values,
+  .tv2-seal,
+  .tv2-report-side
+),
+.cooperation-v2 :is(
+  .cv2-stat-strip article,
+  .cv2-portfolio,
+  .cv2-equity,
+  .cv2-dividend,
+  .cv2-insight,
+  .cv2-ledger,
+  .cv2-drawer,
+  .cv2-portfolio > button,
+  .cv2-dividend__focus
+),
+.governance-v2 :is(
+  .gv2-metric-deck article,
+  .gv2-risk-matrix,
+  .gv2-chain-card,
+  .gv2-stage-card,
+  .gv2-sync-band,
+  .gv2-alert-queue,
+  .gv2-proof-grid > div,
+  .gv2-adapter-grid article
+) {
+  background: rgb(255 255 255 / 92%) !important;
+  border: 1px solid var(--glass-hairline) !important;
+  border-radius: 18px !important;
+  box-shadow:
+    0 1px 2px rgb(9 62 54 / 4%),
+    0 10px 28px rgb(9 62 54 / 7%),
+    inset 0 1px 0 rgb(255 255 255 / 92%) !important;
+  backdrop-filter: none !important;
+}
+
+/* 页头不装进卡片：让标题直接落在画布上，像参考图一样透气 */
+.production-v2 :is(.pv2-hero),
+.trace-v2 :is(.tv2-hero),
+.cooperation-v2 :is(.cv2-hero),
+.governance-v2 :is(.gv2-hero) {
+  background: transparent !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  padding-left: 4px !important;
+}
+
+.production-v2 .pv2-hero::after {
+  display: none !important;
+}
+
+.production-v2 :is(h1, h2, h3, h4),
+.trace-v2 :is(h1, h2, h3, h4),
+.cooperation-v2 :is(h1, h2, h3, h4),
+.governance-v2 :is(h1, h2, h3, h4) {
+  color: var(--ink-900) !important;
+  font-weight: 650 !important;
+}
+
+.production-v2 :is(p, small, time, dt),
+.trace-v2 :is(p, small, time, dt),
+.cooperation-v2 :is(p, small, time, dt),
+.governance-v2 :is(p, small, time, dt) {
+  color: var(--ink-500) !important;
+}
+
+.production-v2 :is(dd, li),
+.trace-v2 :is(dd, li),
+.cooperation-v2 :is(dd, li),
+.governance-v2 :is(dd, li) {
+  color: var(--ink-700) !important;
+}
+
+/* 悬停只抬一层，且阴影带薄荷色调 */
+.production-v2 :is(.pv2-metric-ribbon > button, .pv2-trend-cell, .pv2-water-list > button):hover,
+.cooperation-v2 :is(.cv2-portfolio > button, .cv2-stat-strip article):hover {
+  border-color: rgb(14 124 107 / 22%) !important;
+  box-shadow: 0 12px 30px rgb(13 79 58 / 10%) !important;
+  transform: translateY(-1px);
+}
+
+/* 深色主题遗留的暗底小卡，改成白面 + 发丝边界 */
+.trace-v2 .tv2-chain-stats article,
+.cooperation-v2 .cooperation-insight-card__score {
+  background: rgb(255 255 255 / 92%) !important;
+  border: 1px solid var(--glass-hairline) !important;
+  border-radius: 12px !important;
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 92%) !important;
+}
+
+.trace-v2 .tv2-chain-stats strong,
+.cooperation-v2 .cooperation-insight-card__score strong {
+  color: var(--ink-900) !important;
+}
+
+.trace-v2 .tv2-chain-stats small {
+  color: var(--ink-500) !important;
+}
+
+/* 趋势卡表头的指标图标：彩色浅底图标砖，且尺寸不再被图表 svg 规则误伤 */
+.production-v2 .pv2-trend-cell__head > span {
+  background: color-mix(in srgb, currentColor 12%, #ffffff) !important;
+  border: 1px solid color-mix(in srgb, currentColor 32%, #ffffff) !important;
+  border-radius: 10px !important;
+}
+
+.production-v2 .pv2-trend-cell__head > span svg {
+  display: block !important;
+  width: 16px !important;
+  height: 16px !important;
+  margin: 0 !important;
+}
+
+/* ---------------------------------------------------------------------------
+   6. 控件
+   --------------------------------------------------------------------------- */
+
+.production-v2 :is(
+  .pv2-statusbar__actions .is-primary,
+  .pv2-water-execute
+),
+.trace-v2 :is(
+  .tv2-query-input button,
+  .tv2-report-form > button,
+  .tv2-node-form button,
+  .tv2-operations form > button,
+  .tv2-operations form > div button:first-child
+),
+.cooperation-v2 :is(.cv2-hero > button, .cv2-drawer form > button),
+.governance-v2 :is(.gv2-chain-card > button, .gv2-sync-band header button),
+.ai-summary-generate,
+.ai-summary-drawer__mark {
+  color: #ffffff !important;
+  background: linear-gradient(140deg, #1e957d, #0e7c6b) !important;
+  border-color: transparent !important;
+  border-radius: 14px !important;
+  box-shadow: 0 10px 22px rgb(14 124 107 / 20%) !important;
+}
+
+.production-v2 :is(.pv2-statusbar__actions .is-primary, .pv2-water-execute),
+.ai-entry {
+  background: linear-gradient(140deg, #d4703e, #b24e22) !important;
+  box-shadow: 0 10px 22px rgb(194 90 43 / 24%) !important;
+}
+
+.production-v2 :is(
+  .pv2-hero__actions > button,
+  .pv2-statusbar__actions button:not(.is-primary),
+  .pv2-trend-wall__tools > button,
+  .pv2-water header button,
+  .pv2-proof header button
+),
+.trace-v2 :is(.tv2-mode-tabs button, .tv2-scan-actions button),
+.cooperation-v2 .cv2-ledger > header button {
+  color: var(--ink-700) !important;
+  background: rgb(255 255 255 / 90%) !important;
+  border: 1px solid var(--glass-hairline) !important;
+  border-radius: 12px !important;
+  box-shadow: none !important;
+}
+
+.production-v2 :is(
+  .pv2-hero__actions > button,
+  .pv2-statusbar__actions button:not(.is-primary),
+  .pv2-trend-wall__tools > button,
+  .pv2-water header button,
+  .pv2-proof header button
+):hover,
+.trace-v2 :is(.tv2-mode-tabs button, .tv2-scan-actions button):hover,
+.cooperation-v2 .cv2-ledger > header button:hover {
+  color: var(--mint-800) !important;
+  border-color: rgb(14 124 107 / 26%) !important;
+}
+
+.production-v2 .pv2-trend-wall__periods button.is-active,
+.trace-v2 .tv2-mode-tabs button.is-active,
+.cooperation-v2 .cv2-drawer__tabs button.is-active {
+  color: #ffffff !important;
+  background: linear-gradient(140deg, #1e957d, #0e7c6b) !important;
+  border-color: transparent !important;
+  border-radius: 12px !important;
+  box-shadow: 0 8px 18px rgb(14 124 107 / 20%) !important;
+}
+
+.production-v2 :is(input, select, textarea),
+.trace-v2 :is(input, select, textarea),
+.cooperation-v2 :is(input, select),
+.governance-v2 :is(input, select) {
+  color: var(--ink-900) !important;
+  background: rgb(255 255 255 / 92%) !important;
+  border: 1px solid var(--glass-hairline) !important;
+  border-radius: 12px !important;
+}
+
+.production-v2 :is(input, select, textarea):focus,
+.trace-v2 :is(input, select, textarea):focus,
+.cooperation-v2 :is(input, select):focus,
+.governance-v2 :is(input, select):focus {
+  border-color: var(--mint-500) !important;
+  box-shadow: 0 0 0 3px rgb(30 149 125 / 18%) !important;
+}
+
+.production-v2 :is(input, textarea)::placeholder,
+.trace-v2 :is(input, textarea)::placeholder,
+.cooperation-v2 input::placeholder {
+  color: var(--ink-300) !important;
+}
+
+.shell-content .status-tag {
+  color: var(--color-success-strong) !important;
+  background: var(--color-success-soft) !important;
+  border: 1px solid rgb(14 124 107 / 22%) !important;
+  border-radius: 999px !important;
+}
+
+.shell-content .status-tag--warning {
+  color: var(--color-warning-strong) !important;
+  background: var(--color-warning-soft) !important;
+  border-color: rgb(201 138 22 / 26%) !important;
+}
+
+.shell-content .status-tag--offline {
+  color: var(--color-danger-strong) !important;
+  background: var(--color-danger-soft) !important;
+  border-color: rgb(217 83 79 / 26%) !important;
+}
+
+/* 表格与列表：发丝线，无重描边 */
+.cooperation-v2 :is(.cv2-ledger > article, .cv2-ledger__head),
+.governance-v2 :is(.gv2-risk-row, .gv2-stage-card li, .gv2-alert-queue article, .gv2-log-line),
+.trace-v2 :is(.tv2-key-values > div, .tv2-proof-cards article, .tv2-block-track article),
+.production-v2 .pv2-proof > footer {
+  border-color: var(--color-line-soft) !important;
+}
+
+.cooperation-v2 .cv2-ledger__head,
+.governance-v2 .gv2-log-line {
+  color: var(--ink-500) !important;
+  background: rgb(246 251 248 / 92%) !important;
+}
+
+.cooperation-v2 .cv2-ledger > article:hover,
+.governance-v2 .gv2-alert-queue article:hover,
+.production-v2 .pv2-water-list > button:hover {
+  background: rgb(246 251 248 / 78%) !important;
+}
+
+.cooperation-v2 .cv2-portfolio > button.is-active,
+.production-v2 .pv2-water-list > button.is-selected {
+  background: var(--mint-100) !important;
+  border-color: rgb(14 124 107 / 26%) !important;
+}
+
+.governance-v2 .gv2-risk-row i {
+  background: var(--mint-100) !important;
+}
+
+.governance-v2 .gv2-risk-row i em {
+  background: linear-gradient(90deg, var(--mint-500), var(--mint-700)) !important;
+}
+
+.governance-v2 .gv2-risk-row.is-risk i em {
+  background: linear-gradient(90deg, var(--color-warning), var(--color-danger)) !important;
+}
+
+/* ---------------------------------------------------------------------------
+   7. 模块识别色：四个色相仍可区分，但都收进薄荷家族
+   --------------------------------------------------------------------------- */
+
+.production-v2 {
+  --module-accent: #0e7c6b;
+  --module-accent-strong: #0a6558;
+  --module-accent-ink: #084f45;
+  --module-accent-soft: #e2f0ec;
+}
+
+.trace-v2 {
+  --module-accent: #2e8b57;
+  --module-accent-strong: #1f7048;
+  --module-accent-ink: #175f3c;
+  --module-accent-soft: #e6f2ea;
+}
+
+.cooperation-v2 {
+  --module-accent: #b07a22;
+  --module-accent-strong: #94651a;
+  --module-accent-ink: #7d5616;
+  --module-accent-soft: #f7f0e2;
+}
+
+.governance-v2 {
+  --module-accent: #3a6e9e;
+  --module-accent-strong: #2b5480;
+  --module-accent-ink: #24496f;
+  --module-accent-soft: #e8f0f7;
+}
+
+.tech-app-shell {
+  --shell-accent: var(--mint-600);
+  --shell-accent-soft: rgb(14 124 107 / 10%);
+  --shell-accent-line: rgb(14 124 107 / 18%);
+}
+
+.tech-app-shell.module-trace {
+  --shell-accent: #2e8b57;
+  --shell-accent-soft: rgb(47 158 90 / 10%);
+  --shell-accent-line: rgb(47 158 90 / 18%);
+}
+
+.tech-app-shell.module-cooperation {
+  --shell-accent: #b07a22;
+  --shell-accent-soft: rgb(192 138 46 / 10%);
+  --shell-accent-line: rgb(192 138 46 / 18%);
+}
+
+.tech-app-shell.module-governance {
+  --shell-accent: #3a6e9e;
+  --shell-accent-soft: rgb(61 116 168 / 10%);
+  --shell-accent-line: rgb(61 116 168 / 18%);
+}
+
+/* ---------------------------------------------------------------------------
+   8. 图表与数字
+   --------------------------------------------------------------------------- */
+
+.production-v2 .pv2-trend-grid,
+.production-v2 .pv2-chain-grid {
+  stroke: var(--color-line-soft) !important;
+}
+
+.production-v2 .pv2-trend-line {
+  stroke-width: 2.2 !important;
+}
+
+.production-v2 .pv2-trend-area {
+  opacity: 0.14 !important;
+}
+
+.tech-app-shell :is(
+  .pv2-metric-ribbon strong,
+  .pv2-crop-card strong,
+  .pv2-trend-cell__head strong,
+  .pv2-device-rack header > strong,
+  .tv2-chain-stats strong,
+  .cv2-stat-strip strong,
+  .cv2-insight__score strong,
+  .gv2-metric-deck strong,
+  .gv2-risk-matrix header > strong,
+  .gv2-alert-queue header > strong,
+  .module-panel__meter strong
+) {
+  font-family: var(--font-dashboard-number) !important;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-900) !important;
+}
+
+/* ---------------------------------------------------------------------------
+   9. AI 抽屉
+   --------------------------------------------------------------------------- */
+
+.ai-summary-overlay {
+  background: rgb(18 36 30 / 24%) !important;
+  backdrop-filter: blur(3px) !important;
+}
+
+.ai-summary-drawer {
+  color: var(--ink-900) !important;
+  background: rgb(255 255 255 / 96%) !important;
+  border-left: 1px solid var(--glass-hairline) !important;
+  box-shadow: -26px 0 70px rgb(10 66 48 / 16%) !important;
+  backdrop-filter: blur(24px) !important;
+}
+
+.ai-summary-framework__list button,
+.ai-summary-instruction textarea,
+.ai-summary-thinking,
+.ai-summary-result pre,
+.ai-summary-history > button {
+  color: var(--ink-700) !important;
+  background: rgb(246 251 248 / 92%) !important;
+  border: 1px solid var(--glass-hairline) !important;
+  border-radius: 14px !important;
+}
+
+.ai-summary-framework__list button.is-active {
+  color: var(--mint-800) !important;
+  background: var(--mint-100) !important;
+  border-color: rgb(14 124 107 / 26%) !important;
+}
+
+/* ---------------------------------------------------------------------------
+   10. 通用按钮：base.css 的深绿主按钮并入霜绿体系
+   ---------------------------------------------------------------------------
+   模块内已经单独定过按钮的界面不受影响（那些选择器优先级更高）。
+   --------------------------------------------------------------------------- */
+
+.primary-button {
+  color: #ffffff !important;
+  background: linear-gradient(140deg, #1e957d, #0e7c6b) !important;
+  border: 1px solid transparent !important;
+  border-radius: 14px !important;
+  box-shadow: 0 10px 22px rgb(14 124 107 / 20%) !important;
+}
+
+.primary-button:hover {
+  background: linear-gradient(140deg, #2fb98a, #0a6558) !important;
+}
+
+.secondary-button,
+.icon-button {
+  color: var(--ink-700) !important;
+  background: rgb(255 255 255 / 92%) !important;
+  border: 1px solid var(--glass-hairline) !important;
+  border-radius: 12px !important;
+}
+
+.secondary-button:hover,
+.icon-button:hover {
+  color: var(--mint-800) !important;
+  border-color: rgb(14 124 107 / 26%) !important;
+}
+
+/* 禁用态：不再用半透明主色糊成一片，改成中性底 + 次级文字 */
+.primary-button:disabled,
+.production-v2 :is(.pv2-water-execute, .pv2-statusbar__actions .is-primary):disabled,
+.trace-v2 :is(.tv2-report-form > button, .tv2-node-form button, .tv2-query-input button):disabled {
+  color: var(--ink-500) !important;
+  background: rgb(18 36 30 / 8%) !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+  opacity: 1 !important;
+  cursor: not-allowed !important;
+}
+
+/* ---------------------------------------------------------------------------
+   11. 弹窗：温室与作物档案
+   ---------------------------------------------------------------------------
+   弹窗是模态层，属于"真有层级"的场合：允许玻璃。内部一律白面 + 发丝边界，
+   圆角、留白、焦点环与工作台保持一致。
+   --------------------------------------------------------------------------- */
+
+.greenhouse-manager-overlay {
+  background: rgb(18 36 30 / 28%) !important;
+  backdrop-filter: blur(6px) !important;
+}
+
+.greenhouse-manager-dialog {
+  background: rgb(255 255 255 / 92%) !important;
+  border: 1px solid rgb(255 255 255 / 72%) !important;
+  border-radius: 28px !important;
+  box-shadow:
+    0 32px 80px rgb(9 62 54 / 22%),
+    inset 0 1px 0 rgb(255 255 255 / 92%) !important;
+  backdrop-filter: blur(24px) saturate(1.1) !important;
+}
+
+.greenhouse-manager-header {
+  padding: 18px 22px 14px !important;
+  background: transparent !important;
+  border-bottom: 1px solid var(--glass-hairline) !important;
+}
+
+.greenhouse-manager-header span {
+  color: var(--mint-700) !important;
+  font-weight: 700 !important;
+}
+
+.greenhouse-manager-header h3 {
+  color: var(--ink-900) !important;
+  font-weight: 650 !important;
+}
+
+.greenhouse-manager-header p {
+  color: var(--ink-500) !important;
+}
+
+.greenhouse-manager-header > button {
+  width: 36px !important;
+  height: 36px !important;
+  color: var(--ink-700) !important;
+  background: rgb(255 255 255 / 88%) !important;
+  border: 1px solid var(--glass-hairline) !important;
+  border-radius: 12px !important;
+}
+
+.greenhouse-manager-header > button:hover {
+  color: var(--mint-800) !important;
+  background: var(--mint-100) !important;
+}
+
+/* 左栏：园区温室列表 */
+.greenhouse-manager-list {
+  background: rgb(244 249 248 / 76%) !important;
+  border-right: 1px solid var(--glass-hairline) !important;
+}
+
+.greenhouse-manager-list__head strong {
+  color: var(--ink-900) !important;
+  font-weight: 650 !important;
+}
+
+.greenhouse-manager-list__head span {
+  color: var(--ink-500) !important;
+}
+
+.greenhouse-manager-list__head button {
+  color: var(--mint-800) !important;
+  background: rgb(255 255 255 / 92%) !important;
+  border: 1px solid rgb(14 124 107 / 24%) !important;
+  border-radius: 12px !important;
+}
+
+.greenhouse-site-list {
+  scrollbar-color: rgb(18 36 30 / 22%) transparent;
+}
+
+.greenhouse-site-row {
+  background: rgb(255 255 255 / 92%) !important;
+  border: 1px solid var(--glass-hairline) !important;
+  border-radius: 16px !important;
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 92%) !important;
+}
+
+.greenhouse-site-row.is-active {
+  background: var(--mint-100) !important;
+  border-color: rgb(14 124 107 / 30%) !important;
+  box-shadow:
+    0 10px 24px rgb(9 62 54 / 8%),
+    inset 0 1px 0 rgb(255 255 255 / 92%) !important;
+}
+
+.greenhouse-site-row__copy strong {
+  color: var(--ink-900) !important;
+}
+
+.greenhouse-site-row__copy small {
+  color: var(--ink-700) !important;
+}
+
+.greenhouse-site-row__copy em {
+  color: var(--ink-500) !important;
+}
+
+.greenhouse-site-row__selected {
+  color: var(--mint-700) !important;
+}
+
+.greenhouse-site-row__actions button {
+  color: var(--ink-500) !important;
+  border-radius: 10px !important;
+}
+
+.greenhouse-site-row__actions button:hover {
+  color: var(--mint-800) !important;
+  background: var(--mint-100) !important;
+}
+
+.greenhouse-site-row__actions button:last-child:hover {
+  color: var(--color-danger-strong) !important;
+  background: var(--color-danger-soft) !important;
+}
+
+.greenhouse-site-list__empty {
+  color: var(--ink-500) !important;
+}
+
+/* 右栏：编辑区 */
+.greenhouse-manager-editor {
+  background: transparent !important;
+}
+
+.greenhouse-manager-editor__head {
+  padding: 16px 22px 10px !important;
+}
+
+.greenhouse-manager-editor__head span {
+  color: var(--mint-700) !important;
+}
+
+.greenhouse-manager-editor__head h4 {
+  color: var(--ink-900) !important;
+  font-weight: 650 !important;
+}
+
+.greenhouse-manager-editor__head > button {
+  color: var(--ink-700) !important;
+  background: rgb(255 255 255 / 92%) !important;
+  border: 1px solid var(--glass-hairline) !important;
+  border-radius: 12px !important;
+}
+
+.greenhouse-form-grid {
+  padding: 0 22px 14px !important;
+}
+
+.greenhouse-form-grid label > span,
+.greenhouse-crop-meta label > span {
+  color: var(--ink-700) !important;
+}
+
+.greenhouse-form-grid input,
+.greenhouse-crop-meta input {
+  color: var(--ink-900) !important;
+  background: rgb(255 255 255 / 92%) !important;
+  border: 1px solid var(--glass-hairline) !important;
+  border-radius: 12px !important;
+}
+
+.greenhouse-form-grid input:focus,
+.greenhouse-crop-meta input:focus {
+  border-color: var(--mint-500) !important;
+  box-shadow: 0 0 0 3px rgb(30 149 125 / 18%) !important;
+}
+
+.greenhouse-form-grid input::placeholder,
+.greenhouse-crop-search input::placeholder {
+  color: var(--ink-300) !important;
+}
+
+/* 作物选择区 */
+.greenhouse-crop-picker {
+  background: rgb(244 249 248 / 70%) !important;
+  border-top: 1px solid var(--glass-hairline) !important;
+}
+
+.greenhouse-crop-picker__head span {
+  color: var(--ink-500) !important;
+}
+
+.greenhouse-crop-picker__head strong {
+  color: var(--ink-900) !important;
+}
+
+.greenhouse-crop-picker__head strong em {
+  color: var(--mint-700) !important;
+}
+
+.greenhouse-crop-picker__head small {
+  color: var(--ink-500) !important;
+}
+
+.greenhouse-crop-search {
+  color: var(--ink-500) !important;
+  background: rgb(255 255 255 / 92%) !important;
+  border: 1px solid var(--glass-hairline) !important;
+  border-radius: 12px !important;
+}
+
+.greenhouse-crop-search input {
+  color: var(--ink-900) !important;
+}
+
+.greenhouse-crop-categories button {
+  color: var(--ink-700) !important;
+  background: rgb(255 255 255 / 92%) !important;
+  border: 1px solid var(--glass-hairline) !important;
+  border-radius: 999px !important;
+}
+
+.greenhouse-crop-categories button:hover {
+  color: var(--mint-800) !important;
+  border-color: rgb(14 124 107 / 26%) !important;
+}
+
+.greenhouse-crop-categories button.is-active {
+  color: #ffffff !important;
+  background: linear-gradient(140deg, #1e957d, #0e7c6b) !important;
+  border-color: transparent !important;
+  box-shadow: 0 8px 18px rgb(14 124 107 / 20%) !important;
+}
+
+.greenhouse-crop-options {
+  scrollbar-color: rgb(18 36 30 / 22%) transparent;
+}
+
+.greenhouse-crop-options button {
+  color: var(--ink-700) !important;
+  background: rgb(255 255 255 / 92%) !important;
+  border: 1px solid var(--glass-hairline) !important;
+  border-radius: 14px !important;
+}
+
+.greenhouse-crop-options button:hover {
+  border-color: rgb(14 124 107 / 24%) !important;
+  box-shadow: 0 10px 22px rgb(9 62 54 / 7%) !important;
+}
+
+.greenhouse-crop-options button.is-active {
+  color: var(--mint-800) !important;
+  background: var(--mint-100) !important;
+  border-color: rgb(14 124 107 / 32%) !important;
+}
+
+.greenhouse-crop-options button strong {
+  color: var(--ink-900) !important;
+}
+
+.greenhouse-crop-options button small {
+  color: var(--ink-500) !important;
+}
+
+.greenhouse-crop-options button.is-active small {
+  color: var(--mint-700) !important;
+}
+
+/* 底部确认条与状态提示 */
+.greenhouse-crop-meta {
+  background: rgb(255 255 255 / 92%) !important;
+  border: 1px solid var(--glass-hairline) !important;
+  border-radius: 16px !important;
+}
+
+.greenhouse-crop-meta__current span {
+  color: var(--ink-500) !important;
+}
+
+.greenhouse-crop-meta__current strong {
+  color: var(--mint-700) !important;
+}
+
+.greenhouse-delete-confirm {
+  color: var(--color-danger-strong) !important;
+  background: var(--color-danger-soft) !important;
+  border: 1px solid rgb(217 83 79 / 26%) !important;
+  border-radius: 14px !important;
+}
+
+.greenhouse-delete-confirm span {
+  color: var(--color-danger-strong) !important;
+}
+
+.greenhouse-delete-confirm button {
+  color: var(--ink-700) !important;
+  background: rgb(255 255 255 / 92%) !important;
+  border: 1px solid var(--glass-hairline) !important;
+  border-radius: 12px !important;
+}
+
+.greenhouse-delete-confirm button:last-child {
+  color: #ffffff !important;
+  background: var(--color-danger) !important;
+  border-color: transparent !important;
+}
+
+.greenhouse-manager-message {
+  border-radius: 12px !important;
+}
+
+.greenhouse-manager-message.is-error {
+  color: var(--color-danger-strong) !important;
+  background: var(--color-danger-soft) !important;
+  border: 1px solid rgb(217 83 79 / 26%) !important;
+}
+
+.greenhouse-manager-message.is-success {
+  color: var(--color-success-strong) !important;
+  background: var(--color-success-soft) !important;
+  border: 1px solid rgb(20 135 107 / 26%) !important;
+}
+
+.greenhouse-manager-editor__footer {
+  padding: 14px 22px 18px !important;
+  border-top: 1px solid var(--glass-hairline) !important;
+}
+
+.greenhouse-manager-editor__footer > span {
+  color: var(--ink-500) !important;
+}
+
+.greenhouse-manager-readonly {
+  color: var(--ink-500) !important;
+}
+
+.greenhouse-manager-readonly strong {
+  color: var(--ink-900) !important;
+}
+
+.greenhouse-manager-readonly p {
+  color: var(--ink-500) !important;
+}
+
+/* 弹窗内的滚动条跟着浅色体系走，不要浏览器默认的深色条 */
+.greenhouse-manager-dialog :is(.greenhouse-site-list, .greenhouse-crop-options, .greenhouse-manager-body)::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.greenhouse-manager-dialog :is(.greenhouse-site-list, .greenhouse-crop-options, .greenhouse-manager-body)::-webkit-scrollbar-thumb {
+  background: rgb(18 36 30 / 20%);
+  border: 2px solid transparent;
+  border-radius: 999px;
+  background-clip: padding-box;
+}
+
+.greenhouse-manager-dialog :is(.greenhouse-site-list, .greenhouse-crop-options, .greenhouse-manager-body)::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* ---------------------------------------------------------------------------
+   12. 弹窗：环境阈值设置
+   ---------------------------------------------------------------------------
+   与"温室与作物档案"同一套模态语言：玻璃外壳 + 白面内容 + 霜绿选中态。
+   --------------------------------------------------------------------------- */
+
+.threshold-overlay {
+  background: rgb(18 36 30 / 28%) !important;
+  backdrop-filter: blur(6px) !important;
+}
+
+.threshold-dialog {
+  background: rgb(255 255 255 / 92%) !important;
+  border: 1px solid rgb(255 255 255 / 72%) !important;
+  border-radius: 28px !important;
+  box-shadow:
+    0 32px 80px rgb(9 62 54 / 22%),
+    inset 0 1px 0 rgb(255 255 255 / 92%) !important;
+  backdrop-filter: blur(24px) saturate(1.1) !important;
+}
+
+.threshold-dialog__header {
+  padding: 18px 22px 14px !important;
+  border-bottom: 1px solid var(--glass-hairline) !important;
+}
+
+.threshold-dialog__eyebrow {
+  color: var(--mint-700) !important;
+}
+
+.threshold-dialog__header h3 {
+  color: var(--ink-900) !important;
+  font-weight: 650 !important;
+}
+
+.threshold-dialog__header p {
+  color: var(--ink-500) !important;
+}
+
+.threshold-dialog__close {
+  width: 36px !important;
+  height: 36px !important;
+  color: var(--ink-700) !important;
+  background: rgb(255 255 255 / 88%) !important;
+  border: 1px solid var(--glass-hairline) !important;
+  border-radius: 12px !important;
+}
+
+.threshold-dialog__close:hover {
+  color: var(--mint-800) !important;
+  background: var(--mint-100) !important;
+}
+
+.threshold-metric-list {
+  background: rgb(244 249 248 / 76%) !important;
+  border-right: 1px solid var(--glass-hairline) !important;
+  scrollbar-color: rgb(18 36 30 / 22%) transparent;
+}
+
+.threshold-metric-list > button {
+  color: var(--ink-700) !important;
+  background: rgb(255 255 255 / 92%) !important;
+  border: 1px solid var(--glass-hairline) !important;
+  border-radius: 16px !important;
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 92%) !important;
+}
+
+.threshold-metric-list > button:hover,
+.threshold-metric-list > button.is-active {
+  background: var(--mint-100) !important;
+  border-color: rgb(14 124 107 / 30%) !important;
+}
+
+.threshold-metric-list__icon {
+  border-radius: 10px !important;
+}
+
+.threshold-metric-list__text strong {
+  color: var(--ink-900) !important;
+}
+
+.threshold-metric-list__text small {
+  color: var(--ink-500) !important;
+}
+
+.threshold-metric-list em {
+  color: var(--mint-800) !important;
+  background: var(--mint-100) !important;
+}
+
+.threshold-metric-list em.is-off {
+  color: var(--color-warning-strong) !important;
+  background: var(--color-warning-soft) !important;
+}
+
+.threshold-form__live {
+  background: rgb(255 255 255 / 92%) !important;
+  border: 1px solid var(--glass-hairline) !important;
+  border-radius: 16px !important;
+}
+
+.threshold-form__live strong {
+  color: var(--ink-900) !important;
+}
+
+.threshold-form__live span,
+.threshold-form__live small {
+  color: var(--ink-500) !important;
+}
+
+.threshold-form__group legend,
+.threshold-form label > span,
+.threshold-form__hint {
+  color: var(--ink-500) !important;
+}
+
+.threshold-form select {
+  color: var(--ink-900) !important;
+  background: rgb(255 255 255 / 92%) !important;
+  border: 1px solid var(--glass-hairline) !important;
+  border-radius: 12px !important;
+}
+
+.threshold-form select:focus {
+  border-color: var(--mint-500) !important;
+  box-shadow: 0 0 0 3px rgb(30 149 125 / 18%) !important;
+}
+
+.threshold-switch__track {
+  background: rgb(18 36 30 / 16%) !important;
+}
+
+.threshold-switch input:checked + .threshold-switch__track {
+  background: linear-gradient(140deg, #1e957d, #0e7c6b) !important;
+}
+
+.threshold-switch input:focus-visible + .threshold-switch__track {
+  box-shadow: 0 0 0 3px rgb(30 149 125 / 22%) !important;
+}
+
+.threshold-switch em {
+  color: var(--ink-700) !important;
+}
+
+.threshold-form__message {
+  color: var(--color-success-strong) !important;
+  background: var(--color-success-soft) !important;
+  border: 1px solid rgb(20 135 107 / 26%) !important;
+  border-radius: 12px !important;
+}
+
+.threshold-form__message.is-error {
+  color: var(--color-danger-strong) !important;
+  background: var(--color-danger-soft) !important;
+  border-color: rgb(217 83 79 / 26%) !important;
+}
+
+.threshold-dialog__footer {
+  border-top: 1px solid var(--glass-hairline) !important;
+}
+
+.threshold-dialog :is(.threshold-metric-list, .threshold-dialog__body)::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.threshold-dialog :is(.threshold-metric-list, .threshold-dialog__body)::-webkit-scrollbar-thumb {
+  background: rgb(18 36 30 / 20%);
+  border: 2px solid transparent;
+  border-radius: 999px;
+  background-clip: padding-box;
+}
+
+/* ---------------------------------------------------------------------------
+   13. 排版校准：参考图的正文明显比旧主题更从容
+   --------------------------------------------------------------------------- */
+
+/* 三维场景 HUD 与浮层：这里才是真玻璃，因为它确实浮在场景之上 */
+.production-v2 .pv2-scene::after {
+  background: radial-gradient(
+    circle at 50% 42%,
+    transparent 46%,
+    rgb(9 62 54 / 8%) 78%,
+    rgb(9 62 54 / 16%) 100%
+  ) !important;
+}
+
+.production-v2 .pv2-scene__top {
+  background: linear-gradient(
+    180deg,
+    rgb(255 255 255 / 84%),
+    rgb(255 255 255 / 44%) 54%,
+    transparent 100%
+  ) !important;
+}
+
+.production-v2 .pv2-scene__title span {
+  color: var(--mint-700) !important;
+  text-shadow: none !important;
+}
+
+.production-v2 .pv2-scene__title strong {
+  color: var(--ink-900) !important;
+  text-shadow: none !important;
+}
+
+.production-v2 .pv2-scene__hotspot {
+  background: rgb(255 255 255 / 88%) !important;
+  border: 1px solid rgb(255 255 255 / 72%) !important;
+  box-shadow:
+    0 14px 36px rgb(9 62 54 / 14%),
+    inset 0 1px 0 rgb(255 255 255 / 90%) !important;
+  backdrop-filter: blur(14px) !important;
+}
+
+.production-v2 .pv2-scene__hotspot > span {
+  color: var(--mint-700) !important;
+  background: var(--mint-100) !important;
+}
+
+.production-v2 .pv2-scene__hotspot strong {
+  color: var(--ink-900) !important;
+}
+
+.production-v2 .pv2-scene__hotspot small {
+  color: var(--ink-500) !important;
+}
+
+.production-v2 .pv2-scene__hotspot em {
+  color: var(--mint-700) !important;
+}
+
+.production-v2 .pv2-scene__footer {
+  color: var(--ink-500) !important;
+  text-shadow: none !important;
+}
+
+.production-v2 .pv2-scene__mode-group,
+.production-v2 .pv2-scene__view-actions {
+  background: rgb(255 255 255 / 78%) !important;
+  border: 1px solid rgb(255 255 255 / 72%) !important;
+  box-shadow:
+    0 8px 24px rgb(9 62 54 / 12%),
+    inset 0 1px 0 rgb(255 255 255 / 88%) !important;
+  backdrop-filter: blur(14px) !important;
+}
+
+.production-v2 .pv2-scene__mode-group button,
+.production-v2 .pv2-scene__view-actions button {
+  color: var(--ink-700) !important;
+}
+
+.production-v2 .pv2-scene__mode-group button:hover,
+.production-v2 .pv2-scene__view-actions button:hover {
+  color: var(--mint-800) !important;
+  background: rgb(14 124 107 / 10%) !important;
+}
+
+.production-v2 .pv2-scene__mode-group button.is-active {
+  color: #ffffff !important;
+  background: linear-gradient(140deg, #1e957d, #0e7c6b) !important;
+  box-shadow: 0 6px 18px rgb(14 124 107 / 22%) !important;
+}
+
+.production-v2 .pv2-scene__view-actions button.is-active {
+  color: #ffffff !important;
+  background: linear-gradient(140deg, #1e957d, #0e7c6b) !important;
+}
+
+.production-v2 .pv2-scene__controls button:focus-visible {
+  outline: 2px solid var(--mint-600) !important;
+  outline-offset: 2px;
+}
+
+.production-v2 .pv2-scene__controls button {
+  color: var(--ink-700) !important;
+  background: rgb(255 255 255 / 82%) !important;
+  border-color: rgb(255 255 255 / 72%) !important;
+  box-shadow:
+    0 8px 22px rgb(9 62 54 / 12%),
+    inset 0 1px 0 rgb(255 255 255 / 88%) !important;
+  backdrop-filter: blur(14px) !important;
+}
+
+.production-v2 .pv2-scene__controls button:hover {
+  color: var(--mint-800) !important;
+  border-color: rgb(14 124 107 / 32%) !important;
+}
+
+.production-v2 .pv2-scene__controls button.is-active {
+  color: #ffffff !important;
+  background: linear-gradient(140deg, #1e957d, #0e7c6b) !important;
+  border-color: transparent !important;
+}
+
+.tech-app-shell,
+.ai-summary-drawer {
+  font-size: 13px !important;
+}
+
+.tech-app-shell :is(button, input, select, textarea) {
+  font-size: 12px !important;
+}
+
+.tech-app-shell small {
+  font-size: 10.5px !important;
+}
+
+.tech-app-shell :where(span) {
+  font-size: 11px !important;
+}
+
+.tech-app-shell :where(label) {
+  font-size: 11.5px !important;
+}
+
+.tech-app-shell :where(em, i) {
+  font-size: 10.5px !important;
+}
+
+/* ---------------------------------------------------------------------------
+   14. 字号下限与内容卡收口
+   ---------------------------------------------------------------------------
+   两条规则一起作用：
+   1. 正文类小字抬到 11px 以上，标签 12px、控件 13px，标题到正文的落差收窄；
+   2. 内容卡按自身高度收口，不再被拉满视口，底部不会留下大片空白。
+   --------------------------------------------------------------------------- */
+
+.tech-app-shell small {
+  font-size: 11.5px !important;
+}
+
+.tech-app-shell :where(span) {
+  font-size: 11.5px !important;
+}
+
+.tech-app-shell :where(label) {
+  font-size: 12px !important;
+}
+
+.tech-app-shell :where(em, i) {
+  font-size: 11px !important;
+}
+
+.tech-app-shell :where(footer) {
+  font-size: 11px !important;
+}
+
+.tech-app-shell :is(button, input, select, textarea) {
+  font-size: 13px !important;
+}
+
+/* 旧主题把这几处压到 8–10px，逐条抬回可读区间 */
+.production-v2 :is(
+  .pv2-trend-cell footer,
+  .pv2-trend-axis,
+  .pv2-crop-card p,
+  .pv2-water-summary dt,
+  .pv2-water-summary dd,
+  .pv2-water-summary header span,
+  .pv2-water-progress > small,
+  .pv2-proof-axis,
+  .pv2-device strong,
+  .pv2-water-list strong,
+  .pv2-water-list time
+),
+.trace-v2 :is(
+  .tv2-report-side header span,
+  .tv2-report-side li em,
+  .tv2-report-side li small,
+  .tv2-report-side__summary span,
+  .tv2-report-side__summary strong,
+  .tv2-report-side li strong,
+  .tv2-chain-stats small,
+  .tv2-key-values dt,
+  .tv2-key-values dd,
+  .tv2-node-line > span
+),
+.cooperation-v2 :is(
+  .cv2-insight p,
+  .cv2-insight__bars small,
+  .cv2-insight__bars strong,
+  .cv2-stat-strip strong em,
+  .cv2-ledger > article
+),
+.governance-v2 :is(
+  .gv2-sync-summary dt,
+  .gv2-metric-deck strong em,
+  .gv2-alert-queue header span,
+  .gv2-alert-queue article strong
+),
+.trace-v2 :is(
+  .tv2-operations__flow li,
+  .tv2-report-preview > header span,
+  .tv2-report-preview dt,
+  .tv2-report-preview dd,
+  .tv2-report-preview__flow span,
+  .tv2-report-preview > p
+) {
+  font-size: 11px !important;
+}
+
+/* 字号抬起来之后，原来的单行省略会把指标卡的目标值裁掉，改成允许换行 */
+.production-v2 :is(.pv2-metric-ribbon, .pv2-crop-card) p {
+  overflow: visible !important;
+  line-height: 1.35 !important;
+  text-overflow: clip !important;
+  white-space: normal !important;
+}
+
+/* 状态标签在窄容器里不要被压扁 */
+.shell-content .status-tag {
+  flex: 0 0 auto !important;
+  height: auto !important;
+  min-width: max-content !important;
+  min-height: 26px !important;
+  padding: 0 10px !important;
+  line-height: 1.25 !important;
+  white-space: nowrap !important;
+}
+
+.tech-app-shell .shell-topbar__title span,
+.tech-app-shell .module-panel__system strong,
+.tech-app-shell .module-panel__meter small {
+  font-size: 11px !important;
+}
+
+/* 内容卡收口：卡片跟随内容高度，空白留在画布上而不是卡片里。
+   工作台和报告卡此前被视口高度撑开，auto 行再把多余高度吃掉，
+   于是卡片底部出现一大片空区。 */
+.trace-v2 .tv2-workbench {
+  min-height: 0 !important;
+  align-items: start !important;
+  flex: 0 0 auto !important;
+}
+
+.trace-v2 .tv2-workbench > :is(.tv2-console, .tv2-evidence, .tv2-lab) {
+  height: auto !important;
+}
+
+.trace-v2.is-report .tv2-lab {
+  min-height: 0 !important;
+  align-content: start !important;
+}
+
+.trace-v2 :is(.tv2-chain-body, .tv2-operations),
+.cooperation-v2 :is(.cv2-board, .cv2-ledger),
+.governance-v2 :is(.gv2-risk-board, .gv2-sync-band, .gv2-alert-queue) {
+  flex: 0 0 auto !important;
+}
+
+/* ---------------------------------------------------------------------------
+   16. 治理页卡片收口：清掉历史主题强加的整屏高度
+   ---------------------------------------------------------------------------
+   soft-admin-theme 把风险矩阵那一排卡片锁到 min-height:540px，
+   又让每个风险行 flex:1 平分卡片高度，结果 30px 的内容被摊成 146px 一行，
+   整张卡看过去全是空白。这里统一按"内容多高就多高"收口。
+   --------------------------------------------------------------------------- */
+
+.governance-v2 .gv2-risk-board {
+  min-height: 0 !important;
+  align-items: start !important;
+}
+
+.governance-v2 .gv2-risk-board > :is(
+  .gv2-risk-matrix,
+  .gv2-chain-card,
+  .gv2-stage-card
+) {
+  height: auto !important;
+}
+
+.governance-v2 .gv2-risk-row {
+  flex: 0 0 auto !important;
+  min-height: 0 !important;
+  padding: 11px 14px !important;
+}
+
+.governance-v2 .gv2-risk-row i {
+  margin-top: 6px !important;
+}
+
+.governance-v2 .gv2-risk-matrix > header {
+  padding: 12px 14px !important;
+}
+
+.governance-v2 .gv2-risk-matrix footer {
+  padding: 9px 14px !important;
+}
+
+/* 阶段卡的行列表原本靠 space-around 撑满卡片，现在卡片收口了，改回从上排列 */
+.governance-v2 .gv2-stage-card ol {
+  height: auto !important;
+  align-content: start !important;
+}
+
+/* 可信治理、外部协同这两页只放一张卡，同样不再撑到 520px */
+.governance-v2.is-chain .gv2-chain-card,
+.governance-v2.is-external .gv2-sync-band {
+  min-height: 0 !important;
+}
+
+/* 预警队列空态：没有记录时按一行收口，不留 420px 空白 */
+.governance-v2.is-alerts .gv2-alert-queue {
+  min-height: 0 !important;
+}
+
+.governance-v2 .gv2-alert-queue .gv2-empty {
+  padding: 22px 14px !important;
+}
+
+/* ---------------------------------------------------------------------------
+   17. 治理页字号与组件尺寸整体上调
+   ---------------------------------------------------------------------------
+   历史主题把这张页面压到了 7–9px 的标签 + 22px 的数值，卡片又被拉得很宽，
+   结果就是"小字漂在大卡里"。这里把图层级整体提一档，并把过宽的网格改成
+   自适应列数，让内容把宽度用起来。
+   --------------------------------------------------------------------------- */
+
+/* 页头与区块标题 */
+.governance-v2 .gv2-hero h2 {
+  font-size: 30px !important;
+}
+
+.governance-v2 .gv2-hero p {
+  font-size: 14px !important;
+}
+
+.governance-v2 :is(
+  .gv2-risk-matrix header span,
+  .gv2-chain-card header span,
+  .gv2-sync-band header span,
+  .gv2-alert-queue header span,
+  .gv2-stage-card > header span
+) {
+  font-size: 12px !important;
+  letter-spacing: .09em !important;
+}
+
+.governance-v2 :is(
+  .gv2-risk-matrix h3,
+  .gv2-chain-card h3,
+  .gv2-stage-card h3,
+  .gv2-sync-band h3,
+  .gv2-alert-queue h3
+) {
+  font-size: 18px !important;
+}
+
+.governance-v2 :is(
+  .gv2-risk-matrix header > strong,
+  .gv2-alert-queue header > strong
+) {
+  font-size: 34px !important;
+}
+
+/* 顶部指标卡：图标、标签、数值一起放大 */
+.governance-v2 .gv2-metric-deck {
+  gap: 12px !important;
+}
+
+.governance-v2 .gv2-metric-deck article {
+  grid-template-columns: 50px minmax(0, 1fr) !important;
+  min-height: 128px !important;
+  padding: 16px 18px !important;
+}
+
+.governance-v2 .gv2-metric-deck article > span {
+  width: 50px !important;
+  height: 50px !important;
+}
+
+.governance-v2 .gv2-metric-deck article > span svg {
+  width: 24px;
+  height: 24px;
+}
+
+.governance-v2 .gv2-metric-deck small {
+  font-size: 13.5px !important;
+}
+
+/* 标签在左、数值在右同一行：卡片撑得很宽时不再把数字缩在左上角 */
+.governance-v2 .gv2-metric-deck article > div {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto !important;
+  align-items: end !important;
+  gap: 12px !important;
+}
+
+.governance-v2 .gv2-metric-deck article > div > small {
+  align-self: start !important;
+}
+
+.governance-v2 .gv2-metric-deck strong {
+  margin-top: 0 !important;
+  font-size: 36px !important;
+  line-height: 1.1 !important;
+  text-align: right !important;
+}
+
+.governance-v2 .gv2-metric-deck strong em {
+  font-size: 14px !important;
+}
+
+/* 风险矩阵：行更高、标签更大、进度条更粗 */
+.governance-v2 .gv2-risk-row {
+  grid-template-columns: 34px minmax(0, 1fr) 86px !important;
+  gap: 12px !important;
+  padding: 14px 16px !important;
+}
+
+.governance-v2 .gv2-risk-row > span {
+  font-size: 12.5px !important;
+}
+
+.governance-v2 .gv2-risk-row strong {
+  font-size: 15.5px !important;
+}
+
+.governance-v2 .gv2-risk-row i {
+  height: 6px !important;
+  margin-top: 8px !important;
+}
+
+.governance-v2 .gv2-risk-row b {
+  font-size: 16px !important;
+}
+
+.governance-v2 .gv2-risk-matrix footer {
+  font-size: 12.5px !important;
+}
+
+/* 链上固证：四宫格在宽屏排成一行，别让每格被拉到 900px 宽 */
+.governance-v2 .gv2-chain-mode > span,
+.governance-v2 .gv2-chain-mode small {
+  font-size: 12.5px !important;
+}
+
+.governance-v2 .gv2-chain-mode strong {
+  font-size: 16px !important;
+}
+
+.governance-v2 .gv2-chain-mode code {
+  font-size: 12.5px !important;
+  line-height: 1.6 !important;
+}
+
+.governance-v2 .gv2-proof-grid {
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)) !important;
+  gap: 10px !important;
+  padding: 12px 16px !important;
+}
+
+/* 可信治理页这张卡是整行宽，四宫格排成一行才不显得空 */
+.governance-v2.is-chain .gv2-proof-grid {
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)) !important;
+}
+
+.governance-v2 .gv2-proof-grid > div {
+  padding: 14px !important;
+}
+
+.governance-v2 .gv2-proof-grid span,
+.governance-v2 .gv2-proof-grid small {
+  font-size: 13px !important;
+}
+
+.governance-v2 .gv2-proof-grid strong {
+  margin: 6px 0 !important;
+  font-size: 30px !important;
+}
+
+.governance-v2 .gv2-chain-card > p {
+  margin: 8px 16px !important;
+  font-size: 13px !important;
+}
+
+.governance-v2 .gv2-chain-card > button {
+  min-height: 46px !important;
+  font-size: 14.5px !important;
+}
+
+/* 里程碑 */
+.governance-v2 .gv2-stage-card > header {
+  padding: 14px 16px !important;
+}
+
+.governance-v2 .gv2-stage-card li {
+  padding: 14px 16px !important;
+}
+
+.governance-v2 .gv2-stage-card li i {
+  width: 10px !important;
+  height: 10px !important;
+  flex: 0 0 10px !important;
+}
+
+.governance-v2 .gv2-stage-card li strong {
+  font-size: 15px !important;
+}
+
+.governance-v2 .gv2-stage-card li small {
+  margin-top: 3px !important;
+  font-size: 13px !important;
+}
+
+/* 外部协同：通道摘要、平台卡、日志行一起放大 */
+.governance-v2 .gv2-sync-summary dt {
+  font-size: 13.5px !important;
+}
+
+.governance-v2 .gv2-sync-summary dd {
+  font-size: 18px !important;
+}
+
+.governance-v2 .gv2-sync-band .gv2-adapter-grid {
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)) !important;
+  gap: 12px !important;
+  padding: 14px 16px !important;
+}
+
+.governance-v2 .gv2-adapter-grid article {
+  gap: 12px !important;
+  padding: 14px 16px !important;
+}
+
+.governance-v2 .gv2-adapter-grid article > span {
+  width: 40px !important;
+  height: 40px !important;
+}
+
+.governance-v2 .gv2-adapter-grid article strong {
+  font-size: 15px !important;
+}
+
+.governance-v2 .gv2-adapter-grid article small {
+  margin-top: 3px !important;
+  font-size: 13px !important;
+  line-height: 1.55 !important;
+}
+
+.governance-v2 .gv2-log-line {
+  gap: 18px !important;
+  padding: 12px 16px !important;
+  font-size: 12.5px !important;
+}
+
+.governance-v2 .gv2-alert-queue .gv2-empty {
+  font-size: 14px !important;
+}
+
+/* ---------------------------------------------------------------------------
+   18. 质量溯源四页字号与组件尺寸上调
+   ---------------------------------------------------------------------------
+   体检结果：四个子页面最小字号 9px，小于 12px 的文字节点有 22–55 个，
+   证据流卡片还被 min-height 620/420px 撑出大片空白。这里按治理页同一套
+   比例放大字号与控件，并把被撑高的卡片收回到内容高度。
+   --------------------------------------------------------------------------- */
+
+/* 证据流卡片回到内容高度 */
+.trace-v2.is-query .tv2-evidence,
+.trace-v2.is-evidence .tv2-evidence {
+  min-height: 0 !important;
+}
+
+/* 页头与区块标题 */
+.trace-v2 .tv2-hero h2 {
+  font-size: 30px !important;
+}
+
+.trace-v2 .tv2-hero p {
+  font-size: 14px !important;
+}
+
+.trace-v2 :is(
+  .tv2-hero > div > span,
+  .tv2-console > header span,
+  .tv2-evidence > header span,
+  .tv2-lab > header span,
+  .tv2-operations > header span,
+  .tv2-report-side > header span,
+  .tv2-report-preview > header span
+) {
+  font-size: 12px !important;
+  letter-spacing: .09em !important;
+}
+
+.trace-v2 :is(
+  .tv2-console > header h3,
+  .tv2-evidence > header h3,
+  .tv2-lab > header h3,
+  .tv2-operations > header h3,
+  .tv2-report-side h3,
+  .tv2-report-preview > header h3
+) {
+  font-size: 17.5px !important;
+}
+
+/* 顶部指标与节点延迟 */
+.trace-v2 .tv2-chain-stats small {
+  font-size: 12.5px !important;
+}
+
+.trace-v2 .tv2-chain-stats strong {
+  font-size: 22px !important;
+}
+
+.trace-v2 .tv2-chain-stats strong em {
+  font-size: 12.5px !important;
+}
+
+.trace-v2 .tv2-node-line > span {
+  font-size: 12.5px !important;
+}
+
+/* 控件统一抬高到可点、可读的尺寸 */
+.trace-v2 :is(input, select, textarea) {
+  min-height: 44px !important;
+  font-size: 14px !important;
+}
+
+.trace-v2 .tv2-mode-tabs button,
+.trace-v2 :is(.tv2-scan-actions, .tv2-qr-card__actions, .tv2-node-form, .tv2-report-form) button,
+.trace-v2 .tv2-operations form > button {
+  min-height: 42px !important;
+  font-size: 14px !important;
+}
+
+.trace-v2 :is(.tv2-qr-preview-trigger, .tv2-uploaded) {
+  font-size: 13px !important;
+}
+
+/* 查询页 */
+.trace-v2 .tv2-seal strong {
+  font-size: 20px !important;
+}
+
+.trace-v2 .tv2-seal :is(p, small, span) {
+  font-size: 13px !important;
+}
+
+.trace-v2 .tv2-key-values dt {
+  font-size: 13px !important;
+}
+
+.trace-v2 .tv2-key-values dd {
+  font-size: 13.5px !important;
+}
+
+.trace-v2 .tv2-proof-cards article {
+  padding: 14px 16px !important;
+}
+
+.trace-v2 .tv2-proof-cards article strong {
+  font-size: 14.5px !important;
+}
+
+.trace-v2 .tv2-proof-cards article :is(span, small, code, em) {
+  font-size: 12.5px !important;
+  line-height: 1.6 !important;
+}
+
+/* 链上证据页：区块卡片 */
+.trace-v2 .tv2-block-track article {
+  min-height: 0 !important;
+  gap: 8px !important;
+  padding: 14px !important;
+}
+
+.trace-v2 .tv2-block-track article :is(strong, b) {
+  font-size: 14px !important;
+}
+
+.trace-v2 .tv2-block-track article :is(span, small, code, em, time) {
+  font-size: 12.5px !important;
+  line-height: 1.6 !important;
+}
+
+.trace-v2 :is(.tv2-field-path, .tv2-chain-empty) {
+  font-size: 13.5px !important;
+}
+
+/* 质量报告页 */
+.trace-v2 .tv2-report-side li {
+  padding: 12px 14px !important;
+}
+
+.trace-v2 .tv2-report-side li strong,
+.trace-v2 .tv2-report-side__summary strong {
+  font-size: 14px !important;
+}
+
+.trace-v2 .tv2-report-side li :is(small, span, em),
+.trace-v2 .tv2-report-side__summary span {
+  font-size: 12.5px !important;
+  line-height: 1.6 !important;
+}
+
+.trace-v2 .tv2-report-preview dt {
+  font-size: 12.5px !important;
+}
+
+.trace-v2 .tv2-report-preview dd {
+  font-size: 13.5px !important;
+}
+
+.trace-v2 .tv2-report-preview__flow li {
+  font-size: 12.5px !important;
+}
+
+/* 质量台账页 */
+.trace-v2 .tv2-operations__flow li {
+  font-size: 13.5px !important;
+}
+
+.trace-v2 :is(.tv2-qr-card__meta, .tv2-qr-card__hint, .tv2-qr-card__code) {
+  font-size: 12.5px !important;
+}
+
+.trace-v2 :is(.tv2-form-row, .tv2-report-form) :is(label, span) {
+  font-size: 13px !important;
+}
+
+.trace-v2 :is(th, td) {
+  font-size: 13.5px !important;
+}
+
+/* 水肥计划与周期存证是内容卡，不再撑满视口；三维场景与采样墙保留自适应填充 */
+.production-v2 :is(.pv2-water, .pv2-proof) {
+  flex: 0 0 auto !important;
+}
+
+/* ---------------------------------------------------------------------------
+   15. 深绿质感画布 + 透光玻璃导航
+   ---------------------------------------------------------------------------
+   工作区从浅绿换到深绿，导航玻璃才看得见"透光"。
+   白色数据卡保持原样，只为深底上的文字补对比度。
+   --------------------------------------------------------------------------- */
+
+:root {
+  /* 细颗粒噪点，用来给深绿加材质感；只在固定不滚动的背景层使用 */
+  --grain-texture: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
+}
+
+body {
+  background-image:
+    var(--grain-texture),
+    radial-gradient(1200px 700px at 10% -10%, rgb(30 149 125 / 26%) 0%, rgb(30 149 125 / 0%) 62%),
+    radial-gradient(1000px 620px at 100% 0%, rgb(58 110 158 / 18%) 0%, rgb(58 110 158 / 0%) 58%),
+    radial-gradient(900px 700px at 78% 112%, rgb(12 60 46 / 62%) 0%, rgb(12 60 46 / 0%) 66%),
+    linear-gradient(158deg, #0b2b21 0%, #071d17 48%, #04130f 100%) !important;
+  background-blend-mode: soft-light, normal, normal, normal, normal !important;
+  background-attachment: fixed !important;
+  background-color: #04130f !important;
+}
+
+/* 悬浮窗口：深绿玻璃，靠边缘高光与投影区分层级 */
+.tech-app-shell {
+  background: rgb(9 32 25 / 62%) !important;
+  border: 1px solid rgb(255 255 255 / 12%) !important;
+  box-shadow:
+    0 30px 80px rgb(0 0 0 / 46%),
+    inset 0 1px 0 rgb(255 255 255 / 14%) !important;
+}
+
+.shell-main {
+  /* 工作区用浅灰台面，与左侧深绿导航形成分界：一边是场地，一边是台面 */
+  background-image:
+    var(--grain-texture),
+    radial-gradient(900px 520px at 18% -12%, rgb(255 255 255 / 72%) 0%, rgb(255 255 255 / 0%) 62%),
+    linear-gradient(180deg, #f4f5f6 0%, #eef0f1 55%, #e8eaec 100%) !important;
+  background-blend-mode: soft-light, normal, normal !important;
+  border: 1px solid rgb(255 255 255 / 72%) !important;
+  box-shadow:
+    0 24px 60px rgb(0 0 0 / 30%),
+    inset 0 1px 0 rgb(255 255 255 / 86%) !important;
+}
+
+/* 一级导航：更透的玻璃，图标转冷白 */
+.icon-rail {
+  --nav-icon: #8fb7a9;
+  --nav-icon-strong: #eaf7f0;
+  background: rgb(255 255 255 / 7%) !important;
+  border: 1px solid rgb(255 255 255 / 12%) !important;
+  box-shadow:
+    0 14px 34px rgb(0 0 0 / 30%),
+    inset 0 1px 0 rgb(255 255 255 / 16%) !important;
+  backdrop-filter: blur(22px) saturate(1.2) !important;
+}
+
+.icon-rail__item:hover {
+  color: var(--nav-icon-strong) !important;
+  background: rgb(255 255 255 / 10%) !important;
+}
+
+.icon-rail__item.is-active,
+.icon-rail__item.router-link-exact-active {
+  color: #ffffff !important;
+  background:
+    linear-gradient(
+      180deg,
+      rgb(255 255 255 / 16%),
+      rgb(255 255 255 / 7%)
+    ) !important;
+  border-color: rgb(255 255 255 / 14%) !important;
+  border-radius: 18px !important;
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 20%),
+    inset 0 -1px 0 rgb(0 0 0 / 18%),
+    0 10px 24px rgb(0 0 0 / 28%) !important;
+  backdrop-filter: blur(14px) saturate(1.15);
+}
+
+.icon-rail__item.is-active svg,
+.icon-rail__item.router-link-exact-active svg {
+  color: #ffffff;
+  filter: drop-shadow(0 1px 1px rgb(0 0 0 / 38%));
+}
+
+.icon-rail__item.is-active::before,
+.icon-rail__item.router-link-exact-active::before {
+  display: none !important;
+}
+
+.icon-rail__foot {
+  border-top-color: rgb(255 255 255 / 10%) !important;
+}
+
+.icon-rail__foot button {
+  color: #8fb7a9 !important;
+}
+
+/* 二级导航：透明玻璃，深绿底从面板里透出来 */
+.module-panel {
+  color: #eaf7f0 !important;
+  background: rgb(255 255 255 / 10%) !important;
+  border: 1px solid rgb(255 255 255 / 14%) !important;
+  box-shadow:
+    0 18px 44px rgb(0 0 0 / 34%),
+    inset 0 1px 0 rgb(255 255 255 / 18%) !important;
+  backdrop-filter: blur(26px) saturate(1.25) !important;
+}
+
+.module-panel__header span {
+  color: #5fdcb0 !important;
+}
+
+.module-panel__header h2 {
+  color: #f4fcf8 !important;
+}
+
+.module-panel__header > button {
+  color: #c8ded4 !important;
+  background: rgb(255 255 255 / 10%) !important;
+  border: 1px solid rgb(255 255 255 / 14%) !important;
+}
+
+.module-panel__system {
+  background: transparent !important;
+  border-bottom: 1px solid rgb(255 255 255 / 12%) !important;
+}
+
+.module-panel__system span {
+  color: #a8c9bb !important;
+}
+
+.module-panel__system strong {
+  color: #5fdcb0 !important;
+}
+
+.module-navigation button {
+  color: #cfe3da !important;
+}
+
+.module-navigation__icon {
+  color: #8fb7a9;
+}
+
+.module-navigation button > svg {
+  color: rgb(255 255 255 / 38%) !important;
+}
+
+.module-navigation button:hover {
+  color: #ffffff !important;
+  background: rgb(255 255 255 / 9%) !important;
+}
+
+.module-navigation button:hover .module-navigation__icon {
+  color: #eaf7f0 !important;
+}
+
+.module-navigation button.is-active {
+  color: #ffffff !important;
+  background: linear-gradient(140deg, #2fb98a, #17a374) !important;
+  box-shadow: 0 12px 26px rgb(4 30 23 / 42%) !important;
+}
+
+.module-panel__meter {
+  border-top: 1px solid rgb(255 255 255 / 12%) !important;
+}
+
+.module-panel__meter span,
+.module-panel__meter small {
+  color: #a8c9bb !important;
+}
+
+.module-panel__meter strong {
+  color: #f4fcf8 !important;
+}
+
+/* 顶部工具条：浅灰台面上的白玻璃，文字回到深墨 */
+.shell-topbar {
+  background: rgb(255 255 255 / 74%) !important;
+  border-bottom: 1px solid rgb(18 36 30 / 8%) !important;
+  backdrop-filter: blur(20px) saturate(1.1) !important;
+}
+
+.shell-topbar__title span {
+  color: var(--mint-700) !important;
+}
+
+.shell-topbar__title h1 {
+  color: var(--ink-900) !important;
+}
+
+.shell-topbar__title p {
+  color: var(--ink-500) !important;
+}
+
+.shell-topbar__menu,
+.shell-topbar__telemetry span,
+.shell-user {
+  color: var(--ink-700) !important;
+  background: rgb(255 255 255 / 86%) !important;
+  border: 1px solid var(--glass-hairline) !important;
+}
+
+.shell-topbar__telemetry span :is(svg, i),
+.shell-user svg {
+  color: var(--mint-700) !important;
+}
+
+.shell-user strong {
+  color: var(--ink-900) !important;
+}
+
+.shell-user small {
+  color: var(--ink-500) !important;
+}
+
+/* 页头要真的落到深底上：旧主题给 hero 的白色卡片优先级更高，这里用 #app 压过去 */
+#app :is(.pv2-hero, .tv2-hero, .cv2-hero, .gv2-hero) {
+  background: transparent !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+}
+
+#app :is(.pv2-hero__identity, .tv2-hero > div:first-child, .cv2-hero > div:first-child, .gv2-hero > div:first-child) {
+  color: var(--ink-900) !important;
+}
+
+#app :is(.pv2-hero__identity, .tv2-hero > div:first-child, .cv2-hero > div:first-child, .gv2-hero > div:first-child) :is(h1, h2, h3, strong) {
+  color: var(--ink-900) !important;
+}
+
+#app :is(.pv2-hero__identity, .tv2-hero > div:first-child, .cv2-hero > div:first-child, .gv2-hero > div:first-child) :is(p, small, em) {
+  color: var(--ink-500) !important;
+}
+
+#app :is(.pv2-hero__identity, .tv2-hero > div:first-child, .cv2-hero > div:first-child, .gv2-hero > div:first-child) > span {
+  color: var(--mint-700) !important;
+}
+
+/* 状态条是白卡，卡内文字要回到深墨，不能被深底规则带跑 */
+#app .production-v2 .pv2-statusbar :is(strong, small, span) {
+  color: var(--ink-700) !important;
+}
+
+#app .production-v2 .pv2-statusbar strong {
+  color: var(--ink-900) !important;
+}
+
+#app .production-v2 .pv2-statusbar__dot {
+  color: transparent !important;
+}
+
+/* 导航底部的协同指数此前被旧规则压成深色，深底上等于看不见 */
+#app .module-panel__meter strong {
+  color: #f4fcf8 !important;
+}
+
+#app .module-panel__meter :is(span, small) {
+  color: #a8c9bb !important;
+}
+
+#app .module-panel__meter i {
+  background: linear-gradient(90deg, #2fb98a, #17a374) !important;
+}
+
+/* 白卡内部的低对比文字：琥珀/浅灰在浅底上不够看，统一压深一档 */
+#app .production-v2 .pv2-water-summary :is(span, small),
+#app .production-v2 .pv2-water-list small,
+#app .cooperation-v2 .cv2-portfolio :is(small, em) {
+  color: var(--ink-500) !important;
+}
+
+#app .production-v2 .pv2-water-list em,
+#app .cooperation-v2 .cv2-stat-strip em {
+  color: var(--color-warning-strong) !important;
+}
+
+#app .governance-v2 .gv2-alert-queue article strong.is-risk,
+#app .governance-v2 .gv2-proof-grid strong.is-risk {
+  color: var(--color-danger-strong) !important;
+}
+
+#app .trace-v2 .tv2-report-side__summary span,
+#app .trace-v2 .tv2-report-side > header span {
+  color: var(--ink-500) !important;
+}
+
+#app .cooperation-v2 .cv2-stat-strip :is(em, i, small) {
+  color: var(--color-warning-strong) !important;
+}
+
+#app .cooperation-v2 .cv2-stat-strip article > span {
+  color: var(--color-warning-strong) !important;
+}
+
+/* 质量台账里两个深色遗留按钮，回到白面次级按钮 */
+#app .trace-v2 .tv2-operations form > div button:not(:first-child) {
+  color: var(--ink-700) !important;
+  background: rgb(255 255 255 / 92%) !important;
+  border: 1px solid var(--glass-hairline) !important;
+  border-radius: 12px !important;
+}
+
+#app .trace-v2 .tv2-operations form > div button:not(:first-child):hover {
+  color: var(--mint-800) !important;
+  border-color: rgb(14 124 107 / 26%) !important;
+}
+
+/* 核验通过印章里的编码与说明，压在浅薄荷底上要再深一档 */
+#app .trace-v2 .tv2-seal > span {
+  color: var(--mint-800) !important;
+}
+
+#app .trace-v2 .tv2-seal > small {
+  color: var(--ink-700) !important;
+}
+
+/* 设备机架的兜底说明：演示设备要一眼看出不是真实接入 */
+#app .production-v2 .pv2-device-rack__note {
+  margin: 0 !important;
+  padding: 9px 13px !important;
+  color: var(--color-warning-strong) !important;
+  background: var(--color-warning-soft) !important;
+  border-bottom: 1px solid rgb(201 138 22 / 22%) !important;
+  font-size: 11px !important;
+  line-height: 1.5 !important;
+}
+
+#app .production-v2 .production-device-note {
+  margin: 0 0 10px !important;
+  padding: 8px 12px !important;
+  color: var(--color-warning-strong) !important;
+  background: var(--color-warning-soft) !important;
+  border: 1px solid rgb(201 138 22 / 24%) !important;
+  border-radius: 12px !important;
+  font-size: 11px !important;
+  line-height: 1.5 !important;
+}
+
+/* 风险值底色原来是高饱和琥珀，红字压上去只有 3:1，换成浅琥珀底 */
+#app .governance-v2 .gv2-proof-grid strong.is-risk,
+#app .governance-v2 .gv2-alert-queue article strong.is-risk {
+  background: var(--color-warning-soft) !important;
+  border-radius: 10px !important;
+  padding: 2px 8px !important;
+}
+
+#app .governance-v2 .gv2-error {
+  color: var(--color-danger-strong) !important;
+  background: var(--color-danger-soft) !important;
+  border: 1px solid rgb(217 83 79 / 26%) !important;
+  border-radius: 12px !important;
+  padding: 8px 12px !important;
+}
+
+/* 深底上的滚动条与选区 */
+.shell-content::-webkit-scrollbar-thumb {
+  background: rgb(18 36 30 / 16%) !important;
+}
+
+::selection {
+  color: #062018;
+  background: #6fe0b6;
+}
+
+/* ---------------------------------------------------------------------------
+   16. 响应式：窄屏仍是同一套玻璃语言，只是把导轨折叠
+   --------------------------------------------------------------------------- */
+
+@media (max-width: 1180px) {
+  .tech-app-shell {
+    grid-template-columns: 72px minmax(0, 1fr) !important;
+  }
+
+  .module-panel {
+    left: 72px !important;
+    width: 300px !important;
+    height: calc(100vh - 20px) !important;
+    margin: 10px !important;
+    border-radius: 28px !important;
+    /* -110% 只够把面板自己的宽度推出去，还得带上 left 偏移，否则窄屏会露出一条边 */
+    transform: translateX(calc(-100% - 120px)) !important;
+  }
+
+  .module-panel--open {
+    transform: translateX(0) !important;
+  }
+}
+
+@media (max-width: 760px) {
+  .tech-app-shell {
+    grid-template-columns: 60px minmax(0, 1fr) !important;
+  }
+
+  .icon-rail {
+    align-self: start !important;
+    height: calc(100vh - 20px) !important;
+    margin: 10px 4px 10px 10px !important;
+    padding: 10px 2px !important;
+    border-radius: 26px !important;
+  }
+
+  .module-panel {
+    left: 60px !important;
+  }
+
+  .icon-rail__item {
+    width: 42px !important;
+    min-height: 48px !important;
+    border-radius: 15px !important;
+  }
+
+  .icon-rail__item svg {
+    width: 21px;
+    height: 21px;
+  }
+
+  .shell-main {
+    border-radius: 20px !important;
+    /* 顶部工具条是 nowrap 的，必须让工作区的网格列可收缩，否则会横向溢出 */
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .shell-main > * {
+    min-width: 0 !important;
+  }
+
+  .shell-topbar {
+    gap: 8px !important;
+    padding: 8px 10px !important;
+  }
+
+  .shell-topbar__title {
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+    overflow: hidden !important;
+  }
+
+  /* 窄屏上让位给页面标题本身，省略号只留给真正需要压缩的场合 */
+  .shell-topbar__title > span {
+    display: none !important;
+  }
+
+  .shell-topbar__title h1 {
+    overflow: hidden;
+    font-size: 15px !important;
+    text-overflow: ellipsis;
+  }
+
+  .shell-content {
+    padding: 12px 10px 24px !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .icon-rail__item,
+  .module-navigation button,
+  .production-v2 :is(.pv2-metric-ribbon > button, .pv2-trend-cell, .pv2-water-list > button),
+  .cooperation-v2 :is(.cv2-portfolio > button, .cv2-stat-strip article) {
+    transform: none !important;
+    transition: none !important;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   19. 质量溯源字号：用 #app 提权，压过前面那串 :is(...) 的 11px 规则
+   ---------------------------------------------------------------------------
+   文件前段的 `.trace-v2 :is(很多选择器) { font-size: 11px !important }`
+   因为 :is() 取列表里最高的选择器权重，实际比单条 `.trace-v2 .xxx small`
+   更高，普通写法压不过去，只能用 ID 提权。这一节只改字号，不动颜色和布局。
+   --------------------------------------------------------------------------- */
+
+#app .trace-v2 .tv2-hero > div:first-child > span {
+  font-size: 12px !important;
+  letter-spacing: .09em !important;
+}
+
+#app .trace-v2 .tv2-hero > div:first-child :is(h2, h1) {
+  font-size: 30px !important;
+}
+
+#app .trace-v2 .tv2-hero > div:first-child :is(p, small, em) {
+  font-size: 14px !important;
+}
+
+/* 顶部存证指标与节点延迟 */
+#app .trace-v2 .tv2-chain-stats small {
+  font-size: 12.5px !important;
+}
+
+#app .trace-v2 .tv2-chain-stats strong {
+  font-size: 22px !important;
+  line-height: 1.2 !important;
+}
+
+#app .trace-v2 .tv2-chain-stats strong em {
+  font-size: 12.5px !important;
+}
+
+#app .trace-v2 .tv2-chain-stats article em {
+  margin-top: 3px !important;
+  color: var(--ink-500) !important;
+  font-size: 12px !important;
+  font-style: normal !important;
+}
+
+#app .trace-v2 .tv2-node-line > span {
+  font-size: 12.5px !important;
+}
+
+#app .trace-v2 .tv2-node-line small {
+  font-size: 12px !important;
+}
+
+/* 各卡片的小标题与主标题 */
+#app .trace-v2 :is(
+  .tv2-console,
+  .tv2-evidence,
+  .tv2-lab,
+  .tv2-operations,
+  .tv2-report-preview,
+  .tv2-report-side
+) > header :is(span, small) {
+  font-size: 12px !important;
+  letter-spacing: .09em !important;
+}
+
+#app .trace-v2 :is(
+  .tv2-console,
+  .tv2-evidence,
+  .tv2-lab,
+  .tv2-operations,
+  .tv2-report-preview,
+  .tv2-report-side
+) > header h3 {
+  font-size: 17.5px !important;
+}
+
+/* 键值行、状态标签 */
+#app .trace-v2 .tv2-key-values dt {
+  font-size: 13px !important;
+}
+
+#app .trace-v2 .tv2-key-values dd {
+  font-size: 13.5px !important;
+}
+
+#app .trace-v2 .tv2-key-values code {
+  font-size: 12.5px !important;
+}
+
+#app .trace-v2 .status-tag {
+  font-size: 12.5px !important;
+}
+
+/* 证据流 / 指针链卡片头部的小标签 */
+#app .trace-v2 :is(.tv2-evidence, .tv2-chain-body) > header :is(span, small, em) {
+  font-size: 12px !important;
+  letter-spacing: .09em !important;
+}
+
+/* 台账页表单里的步骤说明 */
+#app .trace-v2 .tv2-operations :is(small, em, span) {
+  font-size: 13px !important;
+}
+
+#app .trace-v2 .tv2-operations form button {
+  min-height: 40px !important;
+  font-size: 13.5px !important;
+}
+
+/* 台账页两张表单不再互相拉平：短的那张不用在中间留一大块空白 */
+#app .trace-v2 .tv2-operations {
+  align-items: start !important;
+}
+
+#app .trace-v2 .tv2-operations__flow {
+  margin-top: 16px !important;
+  align-self: auto !important;
+  padding-top: 12px !important;
+}
+
+/* 查询页：核验印章与证据流卡片 */
+#app .trace-v2 .tv2-seal :is(strong, p, small, span, code) {
+  font-size: 13px !important;
+}
+
+#app .trace-v2 .tv2-seal > strong {
+  font-size: 20px !important;
+}
+
+#app .trace-v2 .tv2-proof-cards article strong {
+  font-size: 14.5px !important;
+}
+
+#app .trace-v2 .tv2-proof-cards article :is(span, small, code, em, time, p) {
+  font-size: 12.5px !important;
+  line-height: 1.6 !important;
+}
+
+/* 证据页：区块卡片与指针链 */
+#app .trace-v2 .tv2-block-track article :is(strong, b) {
+  font-size: 14px !important;
+}
+
+#app .trace-v2 .tv2-block-track article :is(span, small, code, em, time, p) {
+  font-size: 12.5px !important;
+  line-height: 1.6 !important;
+}
+
+#app .trace-v2 :is(.tv2-field-path, .tv2-chain-empty, .tv2-empty) {
+  font-size: 13.5px !important;
+}
+
+/* 报告页 */
+#app .trace-v2 .tv2-report-preview :is(dt, dd, p, li) {
+  font-size: 13px !important;
+}
+
+#app .trace-v2 .tv2-report-preview > header :is(span, small),
+#app .trace-v2 .tv2-report-preview__flow :is(li, span, small) {
+  font-size: 12.5px !important;
+}
+
+#app .trace-v2 .tv2-report-side li strong,
+#app .trace-v2 .tv2-report-side__summary strong {
+  font-size: 14px !important;
+}
+
+#app .trace-v2 .tv2-report-side li :is(small, em, span),
+#app .trace-v2 .tv2-report-side__summary :is(span, small, em) {
+  font-size: 12.5px !important;
+  line-height: 1.6 !important;
+}
+
+#app .trace-v2 :is(.tv2-form-row, .tv2-report-form) :is(label, span, small) {
+  font-size: 13px !important;
+}
+
+/* 台账页 */
+#app .trace-v2 .tv2-operations__flow :is(li, span, small, em) {
+  font-size: 13.5px !important;
+}
+
+#app .trace-v2 :is(.tv2-qr-card__meta, .tv2-qr-card__hint, .tv2-qr-card__code) {
+  font-size: 12.5px !important;
+}
+
+#app .trace-v2 :is(.tv2-uploaded, .tv2-qr-preview-trigger) {
+  font-size: 13px !important;
+}
+
+#app .trace-v2 :is(th, td) {
+  font-size: 13.5px !important;
+}

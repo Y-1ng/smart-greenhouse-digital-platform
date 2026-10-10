@@ -1,0 +1,36 @@
+server:
+  port: ${IOT_PORT:8081}
+  shutdown: graceful
+
+spring:
+  application:
+    name: greenhouse-iot
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+
+app:
+  mqtt:
+    mode: ${MQTT_MODE:logging}
+    broker-url: ${MQTT_BROKER_URL:tcp://localhost:1883}
+    client-id: ${MQTT_CLIENT_ID:greenhouse-iot-service}
+    username: ${MQTT_USERNAME:}
+    password: ${MQTT_PASSWORD:}
+    telemetry-topic: ${MQTT_TELEMETRY_TOPIC:iot/+/+/telemetry}
+    status-topic: ${MQTT_STATUS_TOPIC:iot/+/+/status}
+    command-topic-template: ${MQTT_COMMAND_TOPIC_TEMPLATE:iot/%s/%s/command}
+    ack-topic: ${MQTT_ACK_TOPIC:iot/+/+/ack}
+    qos: ${MQTT_QOS:1}
+  command-dispatch:
+    # 轮询业务服务的待下发指令并发布到 MQTT；logging 模式下只打印日志
+    enabled: ${COMMAND_DISPATCH_ENABLED:true}
+    interval-ms: ${COMMAND_DISPATCH_INTERVAL_MS:3000}
+    initial-delay-ms: ${COMMAND_DISPATCH_INITIAL_DELAY_MS:8000}
+    batch-size: ${COMMAND_DISPATCH_BATCH_SIZE:20}
+  business-api:
+    base-url: ${BUSINESS_API_URL:http://localhost:8090}
+    username: ${BUSINESS_API_USERNAME:iot-service}
+    password: ${BUSINESS_API_PASSWORD:123}

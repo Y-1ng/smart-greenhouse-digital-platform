@@ -1,0 +1,19 @@
+{
+  "name": "smart-greenhouse-contracts",
+  "version": "0.1.0",
+  "private": true,
+  "description": "智慧温室存证合约：编译产物、本地链部署与链上适配服务",
+  "scripts": {
+    "compile": "node 编译合约_compile-contract.cjs istanbul",
+    "deploy:local": "node 部署合约_deploy-contract.cjs --local",
+    "deploy": "node 部署合约_deploy-contract.cjs",
+    "adapter": "node 链上适配服务_chain-adapter.cjs",
+    "adapter:local": "node 链上适配服务_chain-adapter.cjs --local",
+    "smoke": "node 验证链上流程_chain-smoke-test.cjs"
+  },
+  "dependencies": {
+    "ethers": "^6.13.0",
+    "ganache": "^7.9.2",
+    "solc": "0.8.26"
+  }
+}

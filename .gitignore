@@ -1,0 +1,37 @@
+# IDE and OS files
+.idea/
+.vscode/
+*.iml
+.DS_Store
+Thumbs.db
+
+# Java and Maven
+**/target/
+*.log
+hs_err_pid*
+
+# Node.js
+**/node_modules/
+**/dist/
+**/.vite/
+**/coverage/
+
+# Local environment and secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+secrets/
+credentials/
+
+# Local runtime data and generated artifacts
+data/
+output/
+.impeccable/
+.临时文档编辑/
+**/运行日志_*.txt
+{console.error(e)
+

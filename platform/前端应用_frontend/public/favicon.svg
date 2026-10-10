@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="智慧温室">
+  <rect width="64" height="64" rx="14" fill="#173f34" />
+  <path
+    d="M44 18c0 13-7.6 21-19.4 21H20c0-12.4 7.8-21 19.6-21H44Z"
+    fill="#7cc79b"
+  />
+  <path
+    d="M20 46c4.6-8.7 11-15 19.4-19.5"
+    fill="none"
+    stroke="#e7f4ec"
+    stroke-linecap="round"
+    stroke-width="3"
+  />
+</svg>

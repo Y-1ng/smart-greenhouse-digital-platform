@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#071d17" />
+    <link rel="stylesheet" href="/src/cover/styles.css" />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23141416'/%3E%3Cpath d='M15 25a9.5 9.5 0 0 1-1.6-18.8C20.6 4.9 22.7 4.2 25.5.8c1.4 2.7 2.7 5.6 2.7 10.7C28.2 19 22 25 15 25Z' fill='%23f97316'/%3E%3C/svg%3E"
+    />
+    <title>智慧温室 · 首页封面样板</title>
+  </head>
+  <body>
+    <div class="cover" id="cover" tabindex="0">
+      <canvas class="cover__canvas" id="scene"></canvas>
+      <div class="cover__grade" aria-hidden="true"></div>
+      <div class="cover__grid" aria-hidden="true"></div>
+      <div class="cover__scan" aria-hidden="true"></div>
+      <div class="cover__sweep" id="sweep" aria-hidden="true"></div>
+
+      <header class="topbar">
+        <div class="brand">
+          <span class="brand__mark" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z" />
+              <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12" />
+            </svg>
+          </span>
+          <span class="brand__text">
+            <strong>智慧温室</strong>
+            <em>FULL-CHAIN DIGITAL PLATFORM</em>
+          </span>
+        </div>
+
+        <nav class="topnav" id="topnav" aria-label="章节导航"></nav>
+
+        <div class="topbar__aside">
+          <span class="topbar__status"><i></i>园区在线 · 6 座温室</span>
+          <a class="topbar__cta" href="/production/environment" target="_top">进入平台</a>
+        </div>
+      </header>
+
+      <ol class="rail" id="rail" aria-hidden="true"></ol>
+
+      <main class="deck" id="deck"></main>
+
+      <div class="hotspots" id="hotspots"></div>
+
+      <aside class="concept" id="concept" hidden></aside>
+
+      <footer class="dock">
+        <div class="dock__meta">
+          <span class="dock__index" id="dockIndex">01</span>
+          <span class="dock__divider"></span>
+          <span class="dock__total">05</span>
+          <span class="dock__tag" id="dockTag"></span>
+        </div>
+
+        <div class="dots" id="dots" role="tablist" aria-label="场景切换"></div>
+
+        <div class="dock__cue">
+          <span class="dock__wheel" aria-hidden="true"><i></i></span>
+        </div>
+      </footer>
+    </div>
+
+    <script type="module" src="/src/cover/main.js"></script>
+  </body>
+</html>
